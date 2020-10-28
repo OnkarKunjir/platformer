@@ -2,8 +2,6 @@ import pygame
 from src.entity import Entity
 from src.utils import check_collision, update_pos_from_collision
 
-# TODO : make camera follow the player.
-
 class Game:
     def __init__(self):
 
@@ -14,6 +12,8 @@ class Game:
 
         self.RENDER_SURFACE_WIDTH = 500
         self.RENDER_SURFACE_HEIGHT = 400
+
+        self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, self.RENDER_SURFACE_HEIGHT//2)
         self.GRAVITY = 0.2
 
         # pygame related initalization
@@ -39,6 +39,7 @@ class Game:
             Entity(x = 100, y = 10, width = 200, height = 50, color = (255,111,123)),
         ]
         self.move = [0, 0]
+        self.camera = [0, 0]
 
 
     def event_handler(self):
@@ -54,11 +55,11 @@ class Game:
                     # exit game on ESCAPE
                     self.RENDER_FRAME = False
 
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_a:
                     self.MOVE_KEY_PRESSED = True
                     self.DIRECTION = False
 
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_d:
                     self.MOVE_KEY_PRESSED = True
                     self.DIRECTION = True
 
@@ -66,7 +67,7 @@ class Game:
                     self.JUMP = True
 
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_a or event.key == pygame.K_d:
                     self.MOVE_KEY_PRESSED = False
 
 
@@ -74,6 +75,9 @@ class Game:
         '''
         function to update position of all entities based.
         '''
+        self.camera[0] = (self.player.rect.x - self.RENDER_SURFACE_MIDPOINT[0])//20
+        self.camera[1] = (self.player.rect.y - self.RENDER_SURFACE_MIDPOINT[1])//20
+
         if self.JUMP:
             self.move[1] = -5
             self.JUMP = False
@@ -92,6 +96,12 @@ class Game:
                 self.move[i] = -5
 
         update_pos_from_collision(self.player, self.tiles, self.move)
+        self.player.rect.x -= self.camera[0]
+        self.player.rect.y -= self.camera[1]
+
+        for i in self.tiles:
+            i.rect.x -= self.camera[0]
+            i.rect.y -= self.camera[1]
 
     def draw_frame(self):
         '''
