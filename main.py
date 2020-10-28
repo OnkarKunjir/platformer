@@ -1,12 +1,9 @@
 import pygame
 from src.entity import Entity
+from src.utils import check_collision
+from src.config import DISPLAY_WIDTH, DISPLAY_HEIGHT, GRAVITY
 
 pygame.init()
-
-DISPLAY_WIDTH = 1000
-DISPLAY_HEIGHT = 900
-
-GRAVITY = 0.2
 RENDER_FRAME = True
 
 MOVE_KEY_PRESSED = False
@@ -26,15 +23,6 @@ tiles = [
 ]
 
 move = [0, 0]
-
-
-def check_collision(primary_entity, check_against):
-    colliding_entities = []
-    for i in check_against:
-        if primary_entity.rect.colliderect(i.rect):
-            colliding_entities.append(i)
-
-    return colliding_entities
 
 def event_handler(events):
     global RENDER_FRAME, MOVE_KEY_PRESSED, DIRECTION, JUMP
@@ -61,7 +49,7 @@ def event_handler(events):
 def update_entities():
     global GRAVITY, JUMP
     if JUMP:
-        move[1] = -8
+        move[1] = -10
         JUMP = False
 
     move[1] += GRAVITY
@@ -72,10 +60,10 @@ def update_entities():
         move[0] = 0
 
     for i in range(2):
-        if move[i] > 10:
-            move[i] = 10
-        elif move[i] < -10:
-            move[i] = -10
+        if move[i] > 12:
+            move[i] = 12
+        elif move[i] < -12:
+            move[i] = -12
 
     player.move_x(move[0])
     colliding_entities = check_collision(primary_entity = player, check_against = tiles)
