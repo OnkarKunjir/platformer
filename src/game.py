@@ -1,6 +1,8 @@
 import pygame
-from entity import Entity
-from utils import check_collision
+from src.entity import Entity
+from src.utils import check_collision, update_pos_from_collision
+
+# TODO : make camera follow the player.
 
 class Game:
     def __init__(self):
@@ -12,7 +14,7 @@ class Game:
 
         self.RENDER_SURFACE_WIDTH = 500
         self.RENDER_SURFACE_HEIGHT = 400
-        self.GRAVITY = 0.5
+        self.GRAVITY = 0.2
 
         # pygame related initalization
         pygame.init()
@@ -31,15 +33,18 @@ class Game:
         # game objects
         self.player = Entity(x = 10, y = 20, width = 15, height = 30, color = (255,255,255))
         self.tiles = [
-            Entity(x = 0, y = self.RENDER_SURFACE_HEIGHT - 100, width = self.RENDER_SURFACE_WIDTH, height = 200, color = (255,255,123)),
-            Entity(x = 100, y = self.RENDER_SURFACE_HEIGHT - 200, width = 100, height = 100, color = (255,111,123)),
-            Entity(x = 100, y = self.RENDER_SURFACE_HEIGHT - 200, width = 10, height = 100, color = (255,111,123)),
-            Entity(x = 300, y = 10, width = 500, height = 50, color = (255,111,123)),
+            Entity(x = 0, y = self.RENDER_SURFACE_HEIGHT - 100, width = self.RENDER_SURFACE_WIDTH, height = 100, color = (255,255,123)),
+            Entity(x = 100, y = self.RENDER_SURFACE_HEIGHT - 150, width = 50, height = 50, color = (255,111,123)),
+            Entity(x = 200, y = self.RENDER_SURFACE_HEIGHT - 150, width = 50, height = 50, color = (255,111,123)),
+            Entity(x = 100, y = 10, width = 200, height = 50, color = (255,111,123)),
         ]
         self.move = [0, 0]
 
 
     def event_handler(self):
+        '''
+        function to handle events.
+        '''
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.RENDER_FRAME = False
@@ -66,8 +71,11 @@ class Game:
 
 
     def update_entities(self):
+        '''
+        function to update position of all entities based.
+        '''
         if self.JUMP:
-            self.move[1] = -10
+            self.move[1] = -5
             self.JUMP = False
 
         self.move[1] += self.GRAVITY
@@ -78,31 +86,17 @@ class Game:
             self.move[0] = 0
 
         for i in range(2):
-            if self.move[i] > 12:
-                self.move[i] = 12
-            elif self.move[i] < -12:
-                self.move[i] = -12
+            if self.move[i] > 5:
+                self.move[i] = 5
+            elif self.move[i] < -5:
+                self.move[i] = -5
 
-        self.player.move_x(self.move[0])
-        colliding_entities = check_collision(primary_entity = self.player, check_against = self.tiles)
-
-        for i in colliding_entities:
-            if self.move[0] > 0:
-                self.player.rect.right = i.rect.left
-            else:
-                self.player.rect.left = i.rect.right
-
-        self.player.move_y(self.move[1])
-        colliding_entities = check_collision(primary_entity = self.player, check_against = self.tiles)
-
-        for i in colliding_entities:
-            if self.move[1] > 0:
-                self.player.rect.bottom = i.rect.top
-            else:
-                self.player.rect.top = i.rect.bottom
-                self.move[1] = 0
+        update_pos_from_collision(self.player, self.tiles, self.move)
 
     def draw_frame(self):
+        '''
+        draw all components visible in frame.
+        '''
         self.render_surface.fill((0,0,0))
         pygame.draw.rect(self.render_surface, self.player.color, self.player.rect)
 
@@ -110,6 +104,9 @@ class Game:
             pygame.draw.rect(self.render_surface, tile.color, tile.rect)
 
     def play(self):
+        '''
+        run main game loop
+        '''
         while self.RENDER_FRAME:
             self.event_handler()
             self.update_entities()
@@ -122,7 +119,3 @@ class Game:
 
     def __del__(self):
         pygame.quit()
-
-if __name__ == '__main__':
-    game = Game()
-    game.play()

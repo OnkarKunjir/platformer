@@ -13,3 +13,26 @@ def check_collision(primary_entity, check_against):
             colliding_entities.append(i)
 
     return colliding_entities
+
+def update_pos_from_collision(primary_entity, check_against, move):
+    '''
+    function updates the position of primary entity based on collision detection.
+    '''
+    primary_entity.move_x(move[0])
+    colliding_entities = check_collision(primary_entity, check_against)
+
+    for i in colliding_entities:
+        if move[0] > 0:
+            primary_entity.rect.right = i.rect.left
+        else:
+            primary_entity.rect.left = i.rect.right
+
+    primary_entity.move_y(move[1])
+    colliding_entities = check_collision(primary_entity, check_against)
+
+    for i in colliding_entities:
+        if move[1] > 0:
+            primary_entity.rect.bottom = i.rect.top
+        else:
+            primary_entity.rect.top = i.rect.bottom
+            move[1] = 0
