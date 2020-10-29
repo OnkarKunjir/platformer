@@ -1,4 +1,7 @@
 from pygame import Rect
+import os
+import random
+from src.entity import Entity
 
 def check_collision(primary_entity, check_against):
     '''
@@ -36,3 +39,29 @@ def update_pos_from_collision(primary_entity, check_against, move):
         else:
             primary_entity.rect.top = i.rect.bottom
             move[1] = 0
+
+def load_level(level_name, image_size, display_size):
+    '''
+    function loads map from txt file from assets/levels and converts each cell into appropriate Entity element.
+    returns list of Entity.
+    '''
+    level_path = 'assets/levels/' + level_name + '.txt'
+    tiles = []
+
+    if os.path.exists(level_path):
+        with open(level_path, 'r') as lvl:
+            lvl = lvl.read().split('\n')
+            x = 0
+            y = 0
+            for row in lvl:
+                x = 0
+                if len(row.strip()) > 0:
+                    for cell in row.strip().split(','):
+                        cell = int(cell)
+                        if cell == 1:
+                            tiles.append(
+                                Entity(x = x, y = y, width = image_size[0], height = image_size[1], color = (random.randint(1,255),random.randint(1,255),random.randint(1,255))),
+                            )
+                        x += image_size[0]
+                    y += image_size[1]
+    return tiles

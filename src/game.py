@@ -1,6 +1,7 @@
 import pygame
+import random
 from src.entity import Entity
-from src.utils import check_collision, update_pos_from_collision
+from src.utils import check_collision, update_pos_from_collision, load_level
 
 class Game:
     def __init__(self):
@@ -13,7 +14,7 @@ class Game:
         self.RENDER_SURFACE_WIDTH = 500
         self.RENDER_SURFACE_HEIGHT = 400
 
-        self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, self.RENDER_SURFACE_HEIGHT//2)
+        self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, 50 + self.RENDER_SURFACE_HEIGHT//2)
         self.GRAVITY = 0.2
 
         # pygame related initalization
@@ -32,14 +33,11 @@ class Game:
 
         # game objects
         self.player = Entity(x = 10, y = 20, width = 15, height = 30, color = (255,255,255))
-        self.tiles = [
-            Entity(x = 0, y = self.RENDER_SURFACE_HEIGHT - 100, width = self.RENDER_SURFACE_WIDTH, height = 100, color = (255,255,123)),
-            Entity(x = 100, y = self.RENDER_SURFACE_HEIGHT - 150, width = 50, height = 50, color = (255,111,123)),
-            Entity(x = 200, y = self.RENDER_SURFACE_HEIGHT - 150, width = 50, height = 50, color = (255,111,123)),
-            Entity(x = 100, y = 10, width = 200, height = 50, color = (255,111,123)),
-        ]
+        self.tiles = []
         self.move = [0, 0]
         self.camera = [0, 0]
+
+        self.tiles = load_level('dev_lvl', (20,20), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
 
 
     def event_handler(self):
@@ -96,12 +94,13 @@ class Game:
                 self.move[i] = -5
 
         update_pos_from_collision(self.player, self.tiles, self.move)
-        self.player.rect.x -= self.camera[0]
-        self.player.rect.y -= self.camera[1]
-
         for i in self.tiles:
             i.rect.x -= self.camera[0]
             i.rect.y -= self.camera[1]
+
+        self.player.rect.x -= self.camera[0]
+        self.player.rect.y -= self.camera[1]
+
 
     def draw_frame(self):
         '''
