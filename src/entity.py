@@ -13,6 +13,8 @@ def check_collision(primary_entity, check_against):
     '''
     colliding_entities = []
     for i in check_against:
+        if i.rect.x < 0 or i.rect.y < 0 or i.rect.x > 500 or i.rect.y > 400:
+            continue
         if primary_entity.rect.colliderect(i.rect):
             colliding_entities.append(i)
 

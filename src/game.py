@@ -4,7 +4,7 @@ from src.entity import Entity, Player
 from src.utils import load_level
 
 class Game:
-    def __init__(self):
+    def __init__(self, level_name):
 
         # game configurations
         # acpect ration = 5/4
@@ -36,7 +36,7 @@ class Game:
         self.move = [0, 0]
         self.camera = [0, 0]
 
-        self.blocks = load_level('dev_lvl', (20,20), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
+        self.blocks = load_level(level_name, (20,20), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
 
         # assets
         self.dirt_img = pygame.image.load('assets/images/dirt.png')
