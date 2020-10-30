@@ -33,12 +33,14 @@ class Game:
 
         # game objects
         self.player = Entity(x = 10, y = 20, width = 15, height = 30, color = (255,255,255))
-        self.tiles = []
         self.move = [0, 0]
         self.camera = [0, 0]
 
-        self.tiles = load_level('dev_lvl', (20,20), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
+        self.blocks = load_level('dev_lvl', (20,20), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
 
+        # assets
+        self.dirt_img = pygame.image.load('assets/images/dirt.png')
+        self.grass_img = pygame.image.load('assets/images/grass.png')
 
     def event_handler(self):
         '''
@@ -93,8 +95,8 @@ class Game:
             elif self.move[i] < -5:
                 self.move[i] = -5
 
-        update_pos_from_collision(self.player, self.tiles, self.move)
-        for i in self.tiles:
+        update_pos_from_collision(self.player, self.blocks, self.move)
+        for i in self.blocks:
             i.rect.x -= self.camera[0]
             i.rect.y -= self.camera[1]
 
@@ -106,11 +108,15 @@ class Game:
         '''
         draw all components visible in frame.
         '''
-        self.render_surface.fill((0,0,0))
+        self.render_surface.fill((135, 206, 235))
         pygame.draw.rect(self.render_surface, self.player.color, self.player.rect)
 
-        for tile in self.tiles:
-            pygame.draw.rect(self.render_surface, tile.color, tile.rect)
+        for tile in self.blocks:
+            #pygame.draw.rect(self.render_surface, tile.color, tile.rect)
+            if tile.block_type == 1:
+                self.render_surface.blit(self.dirt_img, tile.rect)
+            elif tile.block_type == 2:
+                self.render_surface.blit(self.grass_img, tile.rect)
 
     def play(self):
         '''

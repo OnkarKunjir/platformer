@@ -1,7 +1,7 @@
 from pygame import Rect
 import os
 import random
-from src.entity import Entity
+from src.entity import Entity, Block
 
 def check_collision(primary_entity, check_against):
     '''
@@ -58,9 +58,9 @@ def load_level(level_name, image_size, display_size):
                 if len(row.strip()) > 0:
                     for cell in row.strip().split(','):
                         cell = int(cell)
-                        if cell == 1:
+                        if cell > 0:
                             tiles.append(
-                                Entity(x = x, y = y, width = image_size[0], height = image_size[1], color = (random.randint(1,255),random.randint(1,255),random.randint(1,255))),
+                                Block(x = x, y = y, width = image_size[0], height = image_size[1], color = (random.randint(1,255),random.randint(1,255),random.randint(1,255)), block_type = cell),
                             )
                         x += image_size[0]
                     y += image_size[1]
