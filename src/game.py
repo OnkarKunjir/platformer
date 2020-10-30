@@ -19,11 +19,14 @@ class Game:
 
         # pygame related initalization
         pygame.init()
+        pygame.display.set_caption('Blursed Ninja')
 
         # pygame objects
         self.display = pygame.display.set_mode((self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT))
         self.render_surface = pygame.Surface((self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT))
         self.clock = pygame.time.Clock()
+        self.font = pygame.font.Font(pygame.font.get_default_font() , 10)
+
 
         # game state variables
         self.RENDER_FRAME = True
@@ -38,6 +41,11 @@ class Game:
         # assets
         self.dirt_img = pygame.image.load('assets/images/dirt.png')
         self.grass_img = pygame.image.load('assets/images/grass.png')
+
+    def show_fps(self):
+        text = self.font.render(str(int(self.clock.get_fps())), True, (255, 255, 255), (0, 0, 0))
+        self.render_surface.blit(text , (10 , 10))
+
 
     def event_handler(self):
         '''
@@ -99,6 +107,7 @@ class Game:
                 self.render_surface.blit(self.dirt_img, tile.rect)
             elif tile.block_type == 2:
                 self.render_surface.blit(self.grass_img, tile.rect)
+        self.show_fps()
 
     def play(self):
         '''
@@ -116,3 +125,4 @@ class Game:
 
     def __del__(self):
         pygame.quit()
+        pygame.font.quit()

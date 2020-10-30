@@ -25,11 +25,18 @@ def update_pos_from_collision(primary_entity, check_against, move):
     primary_entity.move_x(move[0])
     colliding_entities = check_collision(primary_entity, check_against)
 
+    left = False
+    right = False
+    top = False
+    bottom = False
+
     for i in colliding_entities:
         if move[0] > 0:
             primary_entity.rect.right = i.rect.left
+            right = True
         else:
             primary_entity.rect.left = i.rect.right
+            left = True
 
     primary_entity.move_y(move[1])
     colliding_entities = check_collision(primary_entity, check_against)
@@ -37,9 +44,13 @@ def update_pos_from_collision(primary_entity, check_against, move):
     for i in colliding_entities:
         if move[1] > 0:
             primary_entity.rect.bottom = i.rect.top
+            bottom = True
         else:
             primary_entity.rect.top = i.rect.bottom
-            move[1] = 0
+            top = True
+            #move[1] = 0
+
+    return left, right, top, bottom
 
 class Entity:
     '''
@@ -75,12 +86,15 @@ class Player(Entity):
         super().__init__(x, y, width, height, color)
 
         # constants
-        self.MAX_VELOCITY = (5, 5)
+        self.MAX_VELOCITY = (4, 5)
         self.GRAVITY = gravity
-        self.JUMP_SPEED = 5
+        self.JUMP_SPEED = 4.5
+        self.MAX_JUMP_COUNT = 2
 
         # player state.
         self.velocity = [0, 0]
+        self.in_mid_air = False
+        self.jump_count = 0
         self.move_direction = {
             'left' : False,
             'right' : False,
@@ -94,9 +108,10 @@ class Player(Entity):
         '''
         self.velocity[1] += self.GRAVITY
 
-        if self.move_direction['up']:
-            self.move_direction['up'] = False
+        if self.move_direction['up'] and (not self.in_mid_air or self.jump_count < self.MAX_JUMP_COUNT):
             self.velocity[1] = -self.JUMP_SPEED
+            self.jump_count += 1
+        self.move_direction['up'] = False
 
         if self.move_direction['left']:
             self.velocity[0] -= 3
@@ -112,4 +127,9 @@ class Player(Entity):
             elif self.velocity[i] < -self.MAX_VELOCITY[i]:
                 self.velocity[i] = -self.MAX_VELOCITY[i]
 
-        update_pos_from_collision(self, blocks, self.velocity)
+        left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity)
+        if top:
+            self.velocity[1] = 0
+        self.in_mid_air = not bottom
+        if not self.in_mid_air:
+            self.jump_count = 0
