@@ -2,6 +2,7 @@ from src.game import Game
 import sys
 
 # TODO:
+# optimize collision detection by checking collision limiter blocks.
 # create mapping for asset image and block type
 # optimize the rendering method.
 

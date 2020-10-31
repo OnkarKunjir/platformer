@@ -1,5 +1,6 @@
 import pygame
 import random
+import configparser
 from src.entity import Entity, Player
 from src.utils import load_level
 
@@ -8,14 +9,15 @@ class Game:
 
         # game configurations
         # acpect ration = 5/4
-        self.DISPLAY_WIDTH = 1000
-        self.DISPLAY_HEIGHT = 800
-
-        self.RENDER_SURFACE_WIDTH = 500
-        self.RENDER_SURFACE_HEIGHT = 400
+        cfg = configparser.ConfigParser()
+        cfg.read('config.ini')
+        self.DISPLAY_WIDTH = int(cfg['DEFAULT']['DISPLAY_WIDTH'])
+        self.DISPLAY_HEIGHT = int(cfg['DEFAULT']['DISPLAY_HEIGHT'])
+        self.RENDER_SURFACE_WIDTH = int(cfg['DEFAULT']['RENDER_SURFACE_WIDTH'])
+        self.RENDER_SURFACE_HEIGHT = int(cfg['DEFAULT']['RENDER_SURFACE_HEIGHT'])
 
         self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, 50 + self.RENDER_SURFACE_HEIGHT//2)
-        self.GRAVITY = 0.2
+        self.GRAVITY = float(cfg['DEFAULT']['GRAVITY'])
 
         # pygame related initalization
         pygame.init()
@@ -32,7 +34,7 @@ class Game:
         self.RENDER_FRAME = True
 
         # game objects
-        self.player = Player(x = 10, y = 20, width = 15, height = 30, color = (255,255,255), gravity = self.GRAVITY)
+        self.player = Player(x = 10, y = 20, width = 15, height = 30, color = (255,255,255))
         self.move = [0, 0]
         self.camera = [0, 0]
 

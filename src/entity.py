@@ -1,10 +1,11 @@
+import configparser
 from pygame import Rect
 
 '''
 module contains Entity, Block and Player class and some important functions specific to entities.
 '''
 
-def check_collision(primary_entity, check_against):
+def check_collision(primary_entity, check_against, max_x, max_y):
     '''
     function to check collision between primary entity and list of non primary entities
     primary_entity = Entity()
@@ -13,19 +14,19 @@ def check_collision(primary_entity, check_against):
     '''
     colliding_entities = []
     for i in check_against:
-        if i.rect.x < 0 or i.rect.y < 0 or i.rect.x > 500 or i.rect.y > 400:
+        if i.rect.x < 0 or i.rect.y < 0 or i.rect.x > max_x or i.rect.y > max_y:
             continue
         if primary_entity.rect.colliderect(i.rect):
             colliding_entities.append(i)
 
     return colliding_entities
 
-def update_pos_from_collision(primary_entity, check_against, move):
+def update_pos_from_collision(primary_entity, check_against, move, max_x, max_y):
     '''
     function updates the position of primary entity based on collision detection.
     '''
     primary_entity.move_x(move[0])
-    colliding_entities = check_collision(primary_entity, check_against)
+    colliding_entities = check_collision(primary_entity, check_against, max_x, max_y)
 
     left = False
     right = False
@@ -41,7 +42,7 @@ def update_pos_from_collision(primary_entity, check_against, move):
             left = True
 
     primary_entity.move_y(move[1])
-    colliding_entities = check_collision(primary_entity, check_against)
+    colliding_entities = check_collision(primary_entity, check_against, max_x, max_y)
 
     for i in colliding_entities:
         if move[1] > 0:
@@ -84,14 +85,20 @@ class Player(Entity):
     player extended form entity contains all state variables required by the player.
     handels jumping and moving also.
     '''
-    def __init__(self, x, y, width, height, color, gravity):
+    def __init__(self, x, y, width, height, color):
         super().__init__(x, y, width, height, color)
+        cfg = configparser.ConfigParser()
+        cfg.read('config.ini')
 
         # constants
-        self.MAX_VELOCITY = (4, 5)
-        self.GRAVITY = gravity
-        self.JUMP_SPEED = 4.5
-        self.MAX_JUMP_COUNT = 2
+        self.MAX_VELOCITY = ( float(cfg['DEFAULT']['MAX_VELOCITY_X']), float(cfg['DEFAULT']['MAX_VELOCITY_Y']) )
+        self.GRAVITY = float(cfg['DEFAULT']['GRAVITY'])
+        self.JUMP_SPEED = float(cfg['DEFAULT']['JUMP_SPEED'])
+        self.MAX_JUMP_COUNT = int(cfg['DEFAULT']['MAX_JUMP_COUNT'])
+
+        self.RENDER_SURFACE_WIDTH = int(cfg['DEFAULT']['RENDER_SURFACE_WIDTH'])
+        self.RENDER_SURFACE_HEIGHT = int(cfg['DEFAULT']['RENDER_SURFACE_HEIGHT'])
+
 
         # player state.
         self.velocity = [0, 0]
@@ -129,7 +136,7 @@ class Player(Entity):
             elif self.velocity[i] < -self.MAX_VELOCITY[i]:
                 self.velocity[i] = -self.MAX_VELOCITY[i]
 
-        left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity)
+        left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity, self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT)
         if top:
             self.velocity[1] = 0
         self.in_mid_air = not bottom

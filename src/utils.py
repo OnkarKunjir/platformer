@@ -1,7 +1,13 @@
-from pygame import Rect
 import os
+import configparser
+from pygame import Rect
 import random
 from src.entity import Entity, Block
+
+
+cfg = configparser.ConfigParser()
+cfg.read('config.ini')
+print(cfg.sections())
 
 def load_level(level_name, image_size, display_size):
     '''
