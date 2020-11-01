@@ -1,7 +1,8 @@
 import pygame
 import random
 import configparser
-from src.entity import Entity, Player
+from src.entity import Entity
+from src.player import Player
 from src.utils import load_level
 from src.camera import Camera
 

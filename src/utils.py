@@ -23,7 +23,7 @@ def load_level(level_name, image_size, display_size):
                         cell = int(cell)
                         if cell > 0:
                             tiles.append(
-                                Block(x = x, y = y, width = image_size[0], height = image_size[1], color = (random.randint(1,255),random.randint(1,255),random.randint(1,255)), block_type = cell),
+                                Block(x = x, y = y, width = image_size[0], height = image_size[1], block_type = cell),
                             )
                         x += image_size[0]
                     y += image_size[1]
