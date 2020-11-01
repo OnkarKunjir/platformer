@@ -1,7 +1,7 @@
 import os
 from pygame import Rect
 import random
-from src.entity import Entity, Block
+from src.entity.block import  Block
 
 def load_level(level_name, image_size, display_size):
     '''
@@ -10,7 +10,6 @@ def load_level(level_name, image_size, display_size):
     '''
     level_path = 'assets/levels/' + level_name + '.txt'
     tiles = []
-
     if os.path.exists(level_path):
         with open(level_path, 'r') as lvl:
             lvl = lvl.read().split('\n')

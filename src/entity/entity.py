@@ -56,7 +56,6 @@ def update_pos_from_collision(primary_entity, check_against, move, max_x = None,
         else:
             primary_entity.rect.top = i.rect.bottom
             top = True
-            #move[1] = 0
 
     return left, right, top, bottom
 

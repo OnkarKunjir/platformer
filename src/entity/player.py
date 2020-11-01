@@ -1,5 +1,5 @@
 import configparser
-from src.entity import Entity, update_pos_from_collision
+from src.entity.entity import Entity, update_pos_from_collision
 
 class Player(Entity):
     '''
