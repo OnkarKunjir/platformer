@@ -16,6 +16,8 @@ class Game:
         self.DISPLAY_HEIGHT = int(cfg['DEFAULT']['DISPLAY_HEIGHT'])
         self.RENDER_SURFACE_WIDTH = int(cfg['DEFAULT']['RENDER_SURFACE_WIDTH'])
         self.RENDER_SURFACE_HEIGHT = int(cfg['DEFAULT']['RENDER_SURFACE_HEIGHT'])
+        self.BLOCK_WIDTH = int(cfg['DEFAULT']['BLOCK_WIDTH'])
+        self.BLOCK_HEIGHT = int(cfg['DEFAULT']['BLOCK_HEIGHT'])
 
         self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, 50 + self.RENDER_SURFACE_HEIGHT//2)
         self.GRAVITY = float(cfg['DEFAULT']['GRAVITY'])
@@ -37,10 +39,9 @@ class Game:
         # game objects
         self.player = Player(x = 10, y = 20, width = 20, height = 40, color = (255,255,255))
         self.move = [0, 0]
-        #self.camera = [0, 0]
         self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
 
-        self.blocks = load_level(level_name, (20,20), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
+        self.blocks = load_level(level_name, (self.BLOCK_WIDTH, self.BLOCK_HEIGHT), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
 
         # assets
         self.dirt_img = pygame.image.load('assets/images/dirt.png')

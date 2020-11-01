@@ -27,3 +27,19 @@ def load_level(level_name, image_size, display_size):
                         x += image_size[0]
                     y += image_size[1]
     return tiles
+
+CHUNK_SIZE = 8
+def generate_chunk(cx, cy, block_size):
+    chunk = []
+    x = cx
+    y = cy
+    for row in range(CHUNK_SIZE):
+        y = cy
+        for col in range(CHUNK_SIZE):
+            chunk.append(
+                Block(x = x, y = y, width = block_size[0], height = block_size[1], block_type = 1),
+            )
+            y += block_size[1]
+        x += block_size[1]
+
+    return chunk

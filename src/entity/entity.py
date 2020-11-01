@@ -77,9 +77,3 @@ class Entity:
         self.rect.x += dist
     def move_y(self, dist):
         self.rect.y += dist
-
-class Block(Entity):
-    def __init__(self, x, y, width, height, block_type):
-        super().__init__(x, y, width, height)
-        self.block_type = block_type
-
