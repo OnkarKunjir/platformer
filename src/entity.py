@@ -5,7 +5,7 @@ from pygame import Rect
 module contains Entity, Block and Player class and some important functions specific to entities.
 '''
 
-def check_collision(primary_entity, check_against, max_x, max_y):
+def check_collision(primary_entity, check_against, max_x = None, max_y = None):
     '''
     function to check collision between primary entity and list of non primary entities
     primary_entity = Entity()
@@ -13,15 +13,20 @@ def check_collision(primary_entity, check_against, max_x, max_y):
     returns list of Entity from check_against which collide with primary_entity
     '''
     colliding_entities = []
-    for i in check_against:
-        if i.rect.x < 0 or i.rect.y < 0 or i.rect.x > max_x or i.rect.y > max_y:
-            continue
-        if primary_entity.rect.colliderect(i.rect):
-            colliding_entities.append(i)
+    if max_x == None or max_y == None:
+        for i in check_against:
+            if primary_entity.rect.colliderect(i.rect):
+                colliding_entities.append(i)
+    else:
+        for i in check_against:
+            if i.rect.x < 0 or i.rect.y < 0 or i.rect.x > max_x or i.rect.y > max_y:
+                continue
+            if primary_entity.rect.colliderect(i.rect):
+                colliding_entities.append(i)
 
     return colliding_entities
 
-def update_pos_from_collision(primary_entity, check_against, move, max_x, max_y):
+def update_pos_from_collision(primary_entity, check_against, move, max_x = None, max_y = None):
     '''
     function updates the position of primary entity based on collision detection.
     '''
@@ -98,8 +103,6 @@ class Player(Entity):
 
         self.RENDER_SURFACE_WIDTH = int(cfg['DEFAULT']['RENDER_SURFACE_WIDTH'])
         self.RENDER_SURFACE_HEIGHT = int(cfg['DEFAULT']['RENDER_SURFACE_HEIGHT'])
-
-
         # player state.
         self.velocity = [0, 0]
         self.in_mid_air = False
@@ -136,7 +139,10 @@ class Player(Entity):
             elif self.velocity[i] < -self.MAX_VELOCITY[i]:
                 self.velocity[i] = -self.MAX_VELOCITY[i]
 
-        left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity, self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT)
+        #left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity, self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT)
+        left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity)
+        self.rect.x = max(0, self.rect.x)
+        self.rect.y = max(0, self.rect.y)
         if top:
             self.velocity[1] = 0
         self.in_mid_air = not bottom

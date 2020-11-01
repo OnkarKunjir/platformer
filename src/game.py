@@ -3,6 +3,7 @@ import random
 import configparser
 from src.entity import Entity, Player
 from src.utils import load_level
+from src.camera import Camera
 
 class Game:
     def __init__(self, level_name):
@@ -34,9 +35,10 @@ class Game:
         self.RENDER_FRAME = True
 
         # game objects
-        self.player = Player(x = 10, y = 20, width = 15, height = 30, color = (255,255,255))
+        self.player = Player(x = 10, y = 20, width = 20, height = 40, color = (255,255,255))
         self.move = [0, 0]
-        self.camera = [0, 0]
+        #self.camera = [0, 0]
+        self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
 
         self.blocks = load_level(level_name, (20,20), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
 
@@ -82,18 +84,19 @@ class Game:
         '''
         function to update position of all entities based.
         '''
-        self.camera[0] = (self.player.rect.x - self.RENDER_SURFACE_MIDPOINT[0])//20
-        self.camera[1] = (self.player.rect.y - self.RENDER_SURFACE_MIDPOINT[1])//20
 
+        self.camera.follow()
+        #self.camera[0] += (self.player.rect.x - self.camera[0] - self.RENDER_SURFACE_MIDPOINT[0])//20
+        #self.camera[1] += (self.player.rect.y - self.camera[1] - self.RENDER_SURFACE_MIDPOINT[1])//20
         self.player.move(self.blocks)
 
         # recenter whole map including player
-        for i in self.blocks:
-            i.rect.x -= self.camera[0]
-            i.rect.y -= self.camera[1]
+        #for i in self.blocks:
+        #    i.rect.x -= self.camera[0]
+        #    i.rect.y -= self.camera[1]
 
-        self.player.rect.x -= self.camera[0]
-        self.player.rect.y -= self.camera[1]
+        #self.player.rect.x -= self.camera[0]
+        #self.player.rect.y -= self.camera[1]
 
 
     def draw_frame(self):
@@ -101,14 +104,20 @@ class Game:
         draw all components visible in frame.
         '''
         self.render_surface.fill((135, 206, 235))
-        pygame.draw.rect(self.render_surface, self.player.color, self.player.rect)
+        player_rect = self.player.rect
+        #pygame.draw.rect(self.render_surface, self.player.color, (player_rect.x - self.camera[0], player_rect.y - self.camera[1], player_rect.width, player_rect.height))
+        pygame.draw.rect(self.render_surface, self.player.color, self.camera.translate(self.player.rect))
 
         for tile in self.blocks:
             #pygame.draw.rect(self.render_surface, tile.color, tile.rect)
+            #if tile.rect.x < -50 or tile.rect.x > self.RENDER_SURFACE_WIDTH + 50 or tile.rect.y < -50 or tile.rect.y > self.RENDER_SURFACE_HEIGHT + 50:
+            #    continue
             if tile.block_type == 1:
-                self.render_surface.blit(self.dirt_img, tile.rect)
+                #self.render_surface.blit(self.dirt_img, (tile.rect.x - self.camera[0], tile.rect.y - self.camera[1], tile.rect.width, tile.rect.height))
+                self.render_surface.blit(self.dirt_img, self.camera.translate(tile.rect))
             elif tile.block_type == 2:
-                self.render_surface.blit(self.grass_img, tile.rect)
+                #self.render_surface.blit(self.grass_img, (tile.rect.x - self.camera[0], tile.rect.y - self.camera[1], tile.rect.width, tile.rect.height))
+                self.render_surface.blit(self.grass_img, self.camera.translate(tile.rect))
         self.show_fps()
 
     def play(self):
