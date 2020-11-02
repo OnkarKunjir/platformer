@@ -2,7 +2,7 @@ import pygame
 import random
 import configparser
 from src.entity.player import Player
-from src.utils import load_level
+from src.utils import load_chunk_map
 from src.camera import Camera
 
 class Game:
@@ -18,6 +18,7 @@ class Game:
         self.RENDER_SURFACE_HEIGHT = int(cfg['DEFAULT']['RENDER_SURFACE_HEIGHT'])
         self.BLOCK_WIDTH = int(cfg['DEFAULT']['BLOCK_WIDTH'])
         self.BLOCK_HEIGHT = int(cfg['DEFAULT']['BLOCK_HEIGHT'])
+        self.CHUNK_SIZE = int(cfg['DEFAULT']['CHUNK_SIZE'])
 
         self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, 50 + self.RENDER_SURFACE_HEIGHT//2)
         self.GRAVITY = float(cfg['DEFAULT']['GRAVITY'])
@@ -41,7 +42,7 @@ class Game:
         self.move = [0, 0]
         self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
 
-        self.blocks = load_level(level_name, (self.BLOCK_WIDTH, self.BLOCK_HEIGHT), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT) )
+        self.chunks = load_chunk_map(level_name, (self.BLOCK_WIDTH, self.BLOCK_HEIGHT), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT), self.CHUNK_SIZE)
 
         # assets
         self.dirt_img = pygame.image.load('assets/images/dirt.png')
@@ -86,23 +87,29 @@ class Game:
         function to update position of all entities based.
         '''
         self.camera.follow()
-        self.player.move(self.blocks)
-
+        #self.player.move(self.blocks)
+        cx = self.player.rect.x//200
+        cy = self.player.rect.y//200
+        blocks = []
+        for i in range(cx-1, cx+2):
+            for j in range(cy-1, cy+2):
+                for c in self.chunks.get((i,j), []):
+                    blocks.append(c)
+        self.player.move(blocks)
 
 
     def draw_frame(self):
-        '''
-        draw all components visible in frame.
-        '''
         self.render_surface.fill((135, 206, 235))
-        player_rect = self.player.rect
         pygame.draw.rect(self.render_surface, self.player.color, self.camera.translate(self.player.rect))
-
-        for tile in self.blocks:
-            if tile.block_type == 1:
-                self.render_surface.blit(self.dirt_img, self.camera.translate(tile.rect))
-            elif tile.block_type == 2:
-                self.render_surface.blit(self.grass_img, self.camera.translate(tile.rect))
+        cx = self.player.rect.x//200
+        cy = self.player.rect.y//200
+        for i in range(cx-2, cx+3):
+            for j in range(cy-2, cy+2):
+                for tile in self.chunks.get((i,j), []):
+                    if tile.block_type == 1:
+                        self.render_surface.blit(self.dirt_img, self.camera.translate(tile.rect))
+                    elif tile.block_type == 2:
+                        self.render_surface.blit(self.grass_img, self.camera.translate(tile.rect))
         self.show_fps()
 
     def play(self):
