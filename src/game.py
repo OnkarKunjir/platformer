@@ -2,8 +2,8 @@ import pygame
 import random
 import configparser
 from src.entity.player import Player
-from src.utils import load_chunk_map
 from src.camera import Camera
+from src.chunked_map import ChunkedMap
 
 class Game:
     def __init__(self, level_name):
@@ -39,10 +39,8 @@ class Game:
 
         # game objects
         self.player = Player(x = 10, y = 20, width = 20, height = 40, color = (255,255,255))
-        self.move = [0, 0]
         self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
-
-        self.chunks = load_chunk_map(level_name, (self.BLOCK_WIDTH, self.BLOCK_HEIGHT), (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT), self.CHUNK_SIZE)
+        self.chunked_map = ChunkedMap(level_name, (2,3), (2,2))
 
         # assets
         self.dirt_img = pygame.image.load('assets/images/dirt.png')
@@ -87,30 +85,24 @@ class Game:
         function to update position of all entities based.
         '''
         self.camera.follow()
-        #self.player.move(self.blocks)
-        cx = self.player.rect.x//200
-        cy = self.player.rect.y//200
-        blocks = []
-        for i in range(cx-1, cx+2):
-            for j in range(cy-1, cy+2):
-                for c in self.chunks.get((i,j), []):
-                    blocks.append(c)
-        self.player.move(blocks)
+        self.chunked_map.update(self.player.rect.x, self.player.rect.y)
+        self.player.move(self.chunked_map.get_blocks())
 
 
     def draw_frame(self):
+        '''
+        function to draw elements of render screen.
+        '''
         self.render_surface.fill((135, 206, 235))
         pygame.draw.rect(self.render_surface, self.player.color, self.camera.translate(self.player.rect))
-        cx = self.player.rect.x//200
-        cy = self.player.rect.y//200
-        for i in range(cx-2, cx+3):
-            for j in range(cy-2, cy+2):
-                for tile in self.chunks.get((i,j), []):
-                    if tile.block_type == 1:
-                        self.render_surface.blit(self.dirt_img, self.camera.translate(tile.rect))
-                    elif tile.block_type == 2:
-                        self.render_surface.blit(self.grass_img, self.camera.translate(tile.rect))
+
+        for tile in self.chunked_map.get_blocks():
+            if tile.block_type == 1:
+                self.render_surface.blit(self.dirt_img, self.camera.translate(tile.rect))
+            elif tile.block_type == 2:
+                self.render_surface.blit(self.grass_img, self.camera.translate(tile.rect))
         self.show_fps()
+
 
     def play(self):
         '''
@@ -123,8 +115,9 @@ class Game:
 
             scaled_surface = pygame.transform.scale(self.render_surface, (self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT))
             self.display.blit(scaled_surface, (0, 0))
+
             pygame.display.update()
-            self.clock.tick(60)
+            self.clock.tick()
 
     def __del__(self):
         pygame.quit()
