@@ -4,7 +4,6 @@ import sys
 # TODO:
 # improve method of storing map.
 # create mapping for asset image and block type
-# optimize the rendering method.
 
 if __name__ == '__main__':
     level_name = 'dev_lvl'

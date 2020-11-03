@@ -4,6 +4,7 @@ import configparser
 from src.entity.player import Player
 from src.camera import Camera
 from src.chunked_map import ChunkedMap
+from src.assets import Assets
 
 class Game:
     def __init__(self, level_name):
@@ -43,8 +44,11 @@ class Game:
         self.chunked_map = ChunkedMap(level_name, (2,3), (2,2))
 
         # assets
-        self.dirt_img = pygame.image.load('assets/images/dirt.png')
-        self.grass_img = pygame.image.load('assets/images/grass.png')
+        self.assets = Assets()
+        self.assets.load()
+        self.dirt_img = pygame.image.load('assets/images/dirt/0.png')
+        self.grass_img = pygame.image.load('assets/images/grass/0.png')
+        self.player_img = pygame.image.load('assets/images/player/0.png')
 
     def show_fps(self):
         text = self.font.render(str(int(self.clock.get_fps())), True, (255, 255, 255), (0, 0, 0))
@@ -94,13 +98,11 @@ class Game:
         function to draw elements of render screen.
         '''
         self.render_surface.fill((135, 206, 235))
-        pygame.draw.rect(self.render_surface, self.player.color, self.camera.translate(self.player.rect))
+        self.render_surface.blit(self.assets.get_image('player'), self.camera.translate(self.player.rect))
 
         for tile in self.chunked_map.get_blocks():
-            if tile.block_type == 1:
-                self.render_surface.blit(self.dirt_img, self.camera.translate(tile.rect))
-            elif tile.block_type == 2:
-                self.render_surface.blit(self.grass_img, self.camera.translate(tile.rect))
+            if tile.block_type > 0:
+                self.render_surface.blit(self.assets.get_mapped_image(tile.block_type), self.camera.translate(tile.rect))
         self.show_fps()
 
 
@@ -117,7 +119,7 @@ class Game:
             self.display.blit(scaled_surface, (0, 0))
 
             pygame.display.update()
-            self.clock.tick()
+            self.clock.tick(60)
 
     def __del__(self):
         pygame.quit()
