@@ -19,3 +19,6 @@ class Camera:
 
     def translate(self, rect):
         return (rect.x - self.x, rect.y - self.y, rect.width, rect.height)
+
+    def translate_xy(self, location):
+        return (location[0]-self.x, location[1]-self.y)

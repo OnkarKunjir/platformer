@@ -5,6 +5,7 @@ from src.entity.player import Player
 from src.camera import Camera
 from src.chunked_map import ChunkedMap
 from src.assets import Assets
+from src.partical_system import ParticleSystem
 
 class Game:
     def __init__(self, level_name):
@@ -42,6 +43,7 @@ class Game:
         self.player = Player(x = 10, y = 20, width = 20, height = 40, color = (255,255,255))
         self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
         self.chunked_map = ChunkedMap(level_name, (2,3), (2,2))
+        self.particle_system = ParticleSystem()
 
         # assets
         self.assets = Assets()
@@ -91,6 +93,8 @@ class Game:
         self.camera.follow()
         self.chunked_map.update(self.player.rect.x, self.player.rect.y)
         self.player.move(self.chunked_map.get_blocks())
+        self.particle_system.add(self.player.rect.x, self.player.rect.y + self.player.rect.height)
+        self.particle_system.update()
 
 
     def draw_frame(self):
@@ -103,6 +107,10 @@ class Game:
         for tile in self.chunked_map.get_blocks():
             if tile.block_type > 0:
                 self.render_surface.blit(self.assets.get_static_block_image(tile.block_type), self.camera.translate(tile.rect))
+
+        # draw particles
+        for particle in self.particle_system.particles:
+            pygame.draw.circle(self.render_surface, particle.color, self.camera.translate_xy(particle.center), particle.radius)
         self.show_fps()
 
 
@@ -119,7 +127,7 @@ class Game:
             self.display.blit(scaled_surface, (0, 0))
 
             pygame.display.update()
-            self.clock.tick(60)
+            self.clock.tick()
 
     def __del__(self):
         pygame.quit()
