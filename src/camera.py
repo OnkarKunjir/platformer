@@ -1,5 +1,11 @@
 class Camera:
     def __init__(self, player, x = 0, y = 0, fx = 0, fy = 0, smooth = 1):
+        '''
+        player = Entity to be tracked with camera.
+        x,y = initial camera coordinates.
+        fx, fy = coordinates of point to focus on.
+        smooth = factor used to smoothout camera movement.
+        '''
         self.player = player
         self.x = x
         self.y = y

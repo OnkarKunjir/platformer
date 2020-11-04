@@ -1,4 +1,6 @@
 import configparser
+from pygame import image
+import os
 from src.entity.entity import Entity, update_pos_from_collision
 
 class Player(Entity):
@@ -30,6 +32,7 @@ class Player(Entity):
             'up' : False
         }
 
+        self.direction = True # True / False = Right / Left
 
     def move(self, blocks):
         '''
@@ -44,8 +47,10 @@ class Player(Entity):
 
         if self.move_direction['left']:
             self.velocity[0] -= 3
+            self.direction = False
         if self.move_direction['right']:
             self.velocity[0] += 3
+            self.direction = True
 
         if not self.move_direction['left'] and not self.move_direction['right']:
             self.velocity[0] = 0

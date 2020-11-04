@@ -35,6 +35,7 @@ class ChunkedMap:
     def load_chunk_map(self, image_size, display_size, chunk_size):
         level_path = 'assets/levels/' + self.level_name + '.txt'
         self.chunks = {}
+
         if os.path.exists(level_path):
             with open(level_path, 'r') as lvl:
                 lvl = lvl.read().split('\n')

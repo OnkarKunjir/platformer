@@ -45,7 +45,7 @@ class Game:
 
         # assets
         self.assets = Assets()
-        self.assets.load()
+        self.assets.load_assets()
         self.dirt_img = pygame.image.load('assets/images/dirt/0.png')
         self.grass_img = pygame.image.load('assets/images/grass/0.png')
         self.player_img = pygame.image.load('assets/images/player/0.png')
@@ -98,11 +98,11 @@ class Game:
         function to draw elements of render screen.
         '''
         self.render_surface.fill((135, 206, 235))
-        self.render_surface.blit(self.assets.get_image('player'), self.camera.translate(self.player.rect))
+        self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
 
         for tile in self.chunked_map.get_blocks():
             if tile.block_type > 0:
-                self.render_surface.blit(self.assets.get_mapped_image(tile.block_type), self.camera.translate(tile.rect))
+                self.render_surface.blit(self.assets.get_static_block_image(tile.block_type), self.camera.translate(tile.rect))
         self.show_fps()
 
 
