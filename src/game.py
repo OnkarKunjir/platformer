@@ -25,6 +25,8 @@ class Game:
         self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, 50 + self.RENDER_SURFACE_HEIGHT//2)
         self.GRAVITY = float(cfg['DEFAULT']['GRAVITY'])
 
+        self.PARTICLE_FRAME_GAP = 10
+
         # pygame related initalization
         pygame.init()
         pygame.display.set_caption('Blursed Ninja')
@@ -38,6 +40,7 @@ class Game:
 
         # game state variables
         self.RENDER_FRAME = True
+        self.frames = 0
 
         # game objects
         self.player = Player(x = 10, y = 20, width = 20, height = 40, color = (255,255,255))
@@ -93,7 +96,22 @@ class Game:
         self.camera.follow()
         self.chunked_map.update(self.player.rect.x, self.player.rect.y)
         self.player.move(self.chunked_map.get_blocks())
-        self.particle_system.add(self.player.rect.x, self.player.rect.y + self.player.rect.height)
+
+        # adding particles when player moves on the ground.
+        if self.player.landed:
+            x = self.player.rect.x + self.player.rect.width // 2
+            y = self.player.rect.y + self.player.rect.height
+            self.particle_system.add(x, y, 3, True)
+            self.particle_system.add(x, y, 3, False)
+
+        if (not self.player.in_mid_air) and (self.frames > self.PARTICLE_FRAME_GAP) and (self.player.move_direction['left'] or self.player.move_direction['right']):
+            self.frames = 0
+            x = self.player.rect.x
+            y = self.player.rect.y + self.player.rect.height
+
+            if self.player.move_direction['left']:
+                x += self.player.rect.width
+            self.particle_system.add(x, y, 5, self.player.direction)
         self.particle_system.update()
 
 
@@ -110,6 +128,8 @@ class Game:
 
         # draw particles
         for particle in self.particle_system.particles:
+            if particle.radius == 0:
+                continue
             pygame.draw.circle(self.render_surface, particle.color, self.camera.translate_xy(particle.center), particle.radius)
         self.show_fps()
 
@@ -126,8 +146,10 @@ class Game:
             scaled_surface = pygame.transform.scale(self.render_surface, (self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT))
             self.display.blit(scaled_surface, (0, 0))
 
+            self.frames += 1
             pygame.display.update()
-            self.clock.tick()
+            self.clock.tick(60)
+
 
     def __del__(self):
         pygame.quit()

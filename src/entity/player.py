@@ -25,6 +25,7 @@ class Player(Entity):
         # player state.
         self.velocity = [0, 0]
         self.in_mid_air = False
+        self.landed = False
         self.jump_count = 0
         self.move_direction = {
             'left' : False,
@@ -67,6 +68,10 @@ class Player(Entity):
         self.rect.y = max(0, self.rect.y)
         if top:
             self.velocity[1] = 0
+        self.landed = False
+        if self.in_mid_air and bottom:
+            self.landed = True
+
         self.in_mid_air = not bottom
         if not self.in_mid_air:
             self.jump_count = 0
