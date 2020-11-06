@@ -2,6 +2,7 @@ import pygame
 import random
 import configparser
 from src.entity.player import Player
+from src.entity.reward import Reward
 from src.camera import Camera
 from src.chunked_map import ChunkedMap
 from src.assets import Assets
@@ -123,6 +124,8 @@ class Game:
         self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
 
         for tile in self.chunked_map.get_blocks():
+            if isinstance(tile, Reward) and not tile.is_valid:
+                continue
             if tile.block_type > 0:
                 self.render_surface.blit(self.assets.get_static_block_image(tile.block_type), self.camera.translate(tile.rect))
 
@@ -148,7 +151,7 @@ class Game:
 
             self.frames += 1
             pygame.display.update()
-            self.clock.tick(60)
+            self.clock.tick()
 
 
     def __del__(self):

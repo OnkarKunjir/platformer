@@ -1,6 +1,7 @@
 import configparser
 import os
 from src.entity.block import Block
+from src.entity.reward import Reward
 
 class ChunkedMap:
     '''
@@ -32,6 +33,15 @@ class ChunkedMap:
 
         self.load_chunk_map((BLOCK_WIDTH, BLOCK_HEIGHT), (RENDER_SURFACE_WIDTH, RENDER_SURFACE_HEIGHT), CHUNK_SIZE)
 
+    def get_entity(self, x, y, image_size, block_type):
+        '''
+        function return entity object of appropriate type according to block_type.
+        '''
+        if block_type == 3:
+            return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type)
+        else:
+            return Block(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type)
+
     def load_chunk_map(self, image_size, display_size, chunk_size):
         level_path = 'assets/levels/' + self.level_name + '.txt'
         self.chunks = {}
@@ -52,7 +62,7 @@ class ChunkedMap:
                                 if (cx, cy) not in self.chunks.keys():
                                     self.chunks[(cx, cy)] = []
                                 self.chunks[(cx, cy)].append(
-                                    Block(x = x, y = y, width = image_size[0], height = image_size[1], block_type = cell),
+                                    self.get_entity(x, y, image_size, cell)
                                 )
                             x += image_size[0]
                         y += image_size[1]

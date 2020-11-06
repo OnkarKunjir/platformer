@@ -1,7 +1,8 @@
 import configparser
 from pygame import image
 import os
-from src.entity.entity import Entity, update_pos_from_collision
+from src.entity.entity import Entity, check_collision
+from src.entity.reward import Reward
 
 class Player(Entity):
     '''
@@ -35,6 +36,48 @@ class Player(Entity):
 
         self.direction = True # True / False = Right / Left
 
+
+    def update_pos_from_collision(self, check_against, move, max_x = None, max_y = None):
+        '''
+        function updates the position of primary entity based on collision detection.
+        '''
+
+        self.move_x(move[0])
+        colliding_entities = check_collision(self, check_against, max_x, max_y)
+
+        left = False
+        right = False
+        top = False
+        bottom = False
+
+        for i in colliding_entities:
+            if isinstance(i, Reward):
+                i.is_valid = False
+                continue
+
+            elif move[0] > 0:
+                self.rect.right = i.rect.left
+                right = True
+            else:
+                self.rect.left = i.rect.right
+                left = True
+
+        self.move_y(move[1])
+        colliding_entities = check_collision(self, check_against, max_x, max_y)
+
+        for i in colliding_entities:
+            if isinstance(i, Reward):
+                i.is_valid = False
+                continue
+            elif move[1] > 0:
+                self.rect.bottom = i.rect.top
+                bottom = True
+            else:
+                self.rect.top = i.rect.bottom
+                top = True
+
+        return left, right, top, bottom
+
     def move(self, blocks):
         '''
         moves the player according to move_direction.
@@ -63,7 +106,7 @@ class Player(Entity):
                 self.velocity[i] = -self.MAX_VELOCITY[i]
 
         #left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity, self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT)
-        left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity)
+        left, right, top, bottom = self.update_pos_from_collision(blocks, self.velocity)
         self.rect.x = max(0, self.rect.x)
         self.rect.y = max(0, self.rect.y)
         if top:

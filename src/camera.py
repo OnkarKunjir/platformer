@@ -1,3 +1,4 @@
+import random
 class Camera:
     def __init__(self, player, x = 0, y = 0, fx = 0, fy = 0, smooth = 1):
         '''

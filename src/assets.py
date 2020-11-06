@@ -7,6 +7,7 @@ class Assets():
         self.static_block_assets_class = [
             'dirt',
             'grass',
+            'coin',
         ]
 
         self.static_blocks = {}
