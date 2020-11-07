@@ -7,9 +7,7 @@ class AnimatedEntity(Entity):
         self.n_frames = n_frames
 
 
-    def get_current_frame(self):
-        c_frame = self.current_frame
+    def update_frame(self):
         self.current_frame += 1
         if self.current_frame >= self.n_frames:
             self.current_frame = 0
-        return c_frame

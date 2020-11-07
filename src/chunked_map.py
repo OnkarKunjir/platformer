@@ -1,5 +1,6 @@
 import configparser
 import os
+import random
 from src.entity.block import Block
 from src.entity.animated_block import AnimatedBlock
 from src.entity.reward import Reward
@@ -80,6 +81,7 @@ class ChunkedMap:
         self.chunk_x = px//self.chunk_pixel_width
         self.chunk_y = py//self.chunk_pixel_height
         self.blocks_on_screen = []
+        self.random_chunk()
 
     def random_chunk(self):
         for i in range(self.chunk_x-self.xb, self.chunk_x+self.xf):
@@ -94,9 +96,15 @@ class ChunkedMap:
                     for row in range(10):
                         x = i * self.chunk_pixel_width
                         for col in range(10):
-                            self.chunks[(cx, cy)].append(
-                                self.get_entity(x, y, (20, 20), 3)
-                            )
+                            if y > 240:
+                                self.chunks[(cx, cy)].append(
+                                    self.get_entity(x, y, (20, 20), 1)
+                                )
+                            elif y == 240:
+                                self.chunks[(cx, cy)].append(
+                                    self.get_entity(x, y, (20, 20), 2)
+                                )
+
                             x += 20
                         y += 20
 

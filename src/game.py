@@ -101,7 +101,11 @@ class Game:
         '''
         self.camera.follow()
         self.chunked_map.update(self.player.rect.x, self.player.rect.y)
-        self.score += self.player.move(self.chunked_map.get_blocks())
+        tiles = self.chunked_map.get_blocks()
+        for tile in tiles:
+            if isinstance(tile, AnimatedEntity):
+                tile.update_frame()
+        self.score += self.player.move(tiles)
 
         # adding particles when player moves on the ground.
         if self.player.landed:
@@ -110,14 +114,14 @@ class Game:
             self.particle_system.add(x, y, 3, True)
             self.particle_system.add(x, y, 3, False)
 
-        if (not self.player.in_mid_air) and (self.frames > self.PARTICLE_FRAME_GAP) and (self.player.move_direction['left'] or self.player.move_direction['right']):
-            self.frames = 0
-            x = self.player.rect.x
-            y = self.player.rect.y + self.player.rect.height
+        #if (not self.player.in_mid_air) and (self.frames > self.PARTICLE_FRAME_GAP) and (self.player.move_direction['left'] or self.player.move_direction['right']):
+        #    self.frames = 0
+        #    x = self.player.rect.x
+        #    y = self.player.rect.y + self.player.rect.height
 
-            if self.player.move_direction['left']:
-                x += self.player.rect.width
-            self.particle_system.add(x, y, 5, self.player.direction)
+        #    if self.player.move_direction['left']:
+        #        x += self.player.rect.width
+        #    self.particle_system.add(x, y, 5, self.player.direction)
         self.particle_system.update()
 
 
@@ -126,14 +130,14 @@ class Game:
         function to draw elements of render screen.
         '''
         self.render_surface.fill((135, 206, 235))
-        pygame.draw.rect(self.render_surface, (255,255,255), self.camera.translate(pygame.Rect(self.chunked_map.chunk_x*200, self.chunked_map.chunk_y*200, 200, 200)))
+        #pygame.draw.rect(self.render_surface, (255,255,255), self.camera.translate(pygame.Rect(self.chunked_map.chunk_x*200, self.chunked_map.chunk_y*200, 200, 200)))
         self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
 
         for tile in self.chunked_map.get_blocks():
             if isinstance(tile, Reward) and not tile.is_valid:
                 continue
             elif isinstance(tile, AnimatedEntity):
-                self.render_surface.blit(self.assets.get_block_image(tile.block_type, tile.get_current_frame()), self.camera.translate(tile.rect))
+                self.render_surface.blit(self.assets.get_block_image(tile.block_type, tile.current_frame), self.camera.translate(tile.rect))
             elif tile.block_type > 0:
                 self.render_surface.blit(self.assets.get_block_image(tile.block_type), self.camera.translate(tile.rect))
 
@@ -151,17 +155,21 @@ class Game:
         '''
         run main game loop
         '''
+        frame_time = 0
         while self.RENDER_FRAME:
-            self.event_handler()
-            self.update_entities()
-            self.draw_frame()
+            frame_time += self.clock.get_time()
+            if frame_time > 15:
+                frame_time = 0
+                self.event_handler()
+                self.update_entities()
+                self.draw_frame()
 
             scaled_surface = pygame.transform.scale(self.render_surface, (self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT))
             self.display.blit(scaled_surface, (0, 0))
 
             self.frames += 1
             pygame.display.update()
-            self.clock.tick(60)
+            self.clock.tick()
 
 
     def __del__(self):
