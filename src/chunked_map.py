@@ -1,6 +1,7 @@
 import configparser
 import os
 from src.entity.block import Block
+from src.entity.animated_block import AnimatedBlock
 from src.entity.reward import Reward
 
 class ChunkedMap:
@@ -41,6 +42,8 @@ class ChunkedMap:
             return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, health_gain = 0, score_gain = 10)
         elif block_type == 4:
             return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, health_gain = 0, score_gain = -10)
+        elif block_type == 5:
+            return AnimatedBlock(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, n_frames= 2)
         else:
             return Block(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type)
 

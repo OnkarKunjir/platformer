@@ -3,6 +3,7 @@ import random
 import configparser
 from src.entity.player import Player
 from src.entity.reward import Reward
+from src.entity.animated_entity import AnimatedEntity
 from src.camera import Camera
 from src.chunked_map import ChunkedMap
 from src.assets import Assets
@@ -131,8 +132,10 @@ class Game:
         for tile in self.chunked_map.get_blocks():
             if isinstance(tile, Reward) and not tile.is_valid:
                 continue
-            if tile.block_type > 0:
-                self.render_surface.blit(self.assets.get_block_image(tile.block_type, self.frames % 2), self.camera.translate(tile.rect))
+            elif isinstance(tile, AnimatedEntity):
+                self.render_surface.blit(self.assets.get_block_image(tile.block_type, tile.get_current_frame()), self.camera.translate(tile.rect))
+            elif tile.block_type > 0:
+                self.render_surface.blit(self.assets.get_block_image(tile.block_type), self.camera.translate(tile.rect))
 
         # draw particles
         for particle in self.particle_system.particles:

@@ -1,4 +1,5 @@
 import random
+# TODO: make add particle function more flexible.
 class Particle:
     def __init__(self, x, y, radius, vx, vy, color = (255, 255, 255)):
         '''
