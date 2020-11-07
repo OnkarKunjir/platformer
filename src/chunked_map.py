@@ -38,7 +38,9 @@ class ChunkedMap:
         function return entity object of appropriate type according to block_type.
         '''
         if block_type == 3:
-            return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type)
+            return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, health_gain = 0, score_gain = 10)
+        elif block_type == 4:
+            return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, health_gain = 0, score_gain = -10)
         else:
             return Block(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type)
 
@@ -75,6 +77,25 @@ class ChunkedMap:
         self.chunk_x = px//self.chunk_pixel_width
         self.chunk_y = py//self.chunk_pixel_height
         self.blocks_on_screen = []
+
+    def random_chunk(self):
+        for i in range(self.chunk_x-self.xb, self.chunk_x+self.xf):
+            for j in range(self.chunk_y-self.yb, self.chunk_y+self.yf):
+                x = i * self.chunk_pixel_width
+                y =  j * self.chunk_pixel_height
+                cx = i
+                cy = j
+                if (cx, cy) not in self.chunks.keys():
+                    self.chunks[(cx, cy)] = []
+
+                    for row in range(10):
+                        x = i * self.chunk_pixel_width
+                        for col in range(10):
+                            self.chunks[(cx, cy)].append(
+                                self.get_entity(x, y, (20, 20), 3)
+                            )
+                            x += 20
+                        y += 20
 
 
     def get_blocks(self):

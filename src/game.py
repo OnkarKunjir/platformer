@@ -42,6 +42,7 @@ class Game:
         # game state variables
         self.RENDER_FRAME = True
         self.frames = 0
+        self.score = 0
 
         # game objects
         self.player = Player(x = 10, y = 20, width = 20, height = 40, color = (255,255,255))
@@ -58,8 +59,11 @@ class Game:
 
     def show_fps(self):
         text = self.font.render(str(int(self.clock.get_fps())), True, (255, 255, 255), (0, 0, 0))
-        self.render_surface.blit(text , (10 , 10))
+        self.render_surface.blit(text , (470 , 10))
 
+    def show_score(self):
+        text = self.font.render(str(self.score), True, (255, 255, 255), (0, 0, 0))
+        self.render_surface.blit(text , (10 , 10))
 
     def event_handler(self):
         '''
@@ -96,7 +100,7 @@ class Game:
         '''
         self.camera.follow()
         self.chunked_map.update(self.player.rect.x, self.player.rect.y)
-        self.player.move(self.chunked_map.get_blocks())
+        self.score += self.player.move(self.chunked_map.get_blocks())
 
         # adding particles when player moves on the ground.
         if self.player.landed:
@@ -121,20 +125,23 @@ class Game:
         function to draw elements of render screen.
         '''
         self.render_surface.fill((135, 206, 235))
+        pygame.draw.rect(self.render_surface, (255,255,255), self.camera.translate(pygame.Rect(self.chunked_map.chunk_x*200, self.chunked_map.chunk_y*200, 200, 200)))
         self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
 
         for tile in self.chunked_map.get_blocks():
             if isinstance(tile, Reward) and not tile.is_valid:
                 continue
             if tile.block_type > 0:
-                self.render_surface.blit(self.assets.get_static_block_image(tile.block_type), self.camera.translate(tile.rect))
+                self.render_surface.blit(self.assets.get_block_image(tile.block_type, self.frames % 2), self.camera.translate(tile.rect))
 
         # draw particles
         for particle in self.particle_system.particles:
             if particle.radius == 0:
                 continue
             pygame.draw.circle(self.render_surface, particle.color, self.camera.translate_xy(particle.center), particle.radius)
+
         self.show_fps()
+        self.show_score()
 
 
     def play(self):
@@ -151,7 +158,7 @@ class Game:
 
             self.frames += 1
             pygame.display.update()
-            self.clock.tick()
+            self.clock.tick(60)
 
 
     def __del__(self):

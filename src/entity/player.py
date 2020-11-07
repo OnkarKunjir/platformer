@@ -42,6 +42,7 @@ class Player(Entity):
         function updates the position of primary entity based on collision detection.
         '''
 
+        score = 0
         self.move_x(move[0])
         colliding_entities = check_collision(self, check_against, max_x, max_y)
 
@@ -52,7 +53,10 @@ class Player(Entity):
 
         for i in colliding_entities:
             if isinstance(i, Reward):
-                i.is_valid = False
+                if i.is_valid:
+                    score += i.score_gain
+                    if i.block_type == 3:
+                        i.is_valid = False
                 continue
 
             elif move[0] > 0:
@@ -67,7 +71,10 @@ class Player(Entity):
 
         for i in colliding_entities:
             if isinstance(i, Reward):
-                i.is_valid = False
+                if i.is_valid:
+                    score += i.score_gain
+                    if i.block_type == 3:
+                        i.is_valid = False
                 continue
             elif move[1] > 0:
                 self.rect.bottom = i.rect.top
@@ -76,7 +83,7 @@ class Player(Entity):
                 self.rect.top = i.rect.bottom
                 top = True
 
-        return left, right, top, bottom
+        return left, right, top, bottom, score
 
     def move(self, blocks):
         '''
@@ -106,7 +113,7 @@ class Player(Entity):
                 self.velocity[i] = -self.MAX_VELOCITY[i]
 
         #left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity, self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT)
-        left, right, top, bottom = self.update_pos_from_collision(blocks, self.velocity)
+        left, right, top, bottom, score= self.update_pos_from_collision(blocks, self.velocity)
         self.rect.x = max(0, self.rect.x)
         self.rect.y = max(0, self.rect.y)
         if top:
@@ -118,3 +125,5 @@ class Player(Entity):
         self.in_mid_air = not bottom
         if not self.in_mid_air:
             self.jump_count = 0
+
+        return score

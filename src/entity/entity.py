@@ -26,38 +26,6 @@ def check_collision(primary_entity, check_against, max_x = None, max_y = None):
 
     return colliding_entities
 
-def update_pos_from_collision(primary_entity, check_against, move, max_x = None, max_y = None):
-    '''
-    function updates the position of primary entity based on collision detection.
-    '''
-    primary_entity.move_x(move[0])
-    colliding_entities = check_collision(primary_entity, check_against, max_x, max_y)
-
-    left = False
-    right = False
-    top = False
-    bottom = False
-
-    for i in colliding_entities:
-        if move[0] > 0:
-            primary_entity.rect.right = i.rect.left
-            right = True
-        else:
-            primary_entity.rect.left = i.rect.right
-            left = True
-
-    primary_entity.move_y(move[1])
-    colliding_entities = check_collision(primary_entity, check_against, max_x, max_y)
-
-    for i in colliding_entities:
-        if move[1] > 0:
-            primary_entity.rect.bottom = i.rect.top
-            bottom = True
-        else:
-            primary_entity.rect.top = i.rect.bottom
-            top = True
-
-    return left, right, top, bottom
 
 class Entity:
     '''

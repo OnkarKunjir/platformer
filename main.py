@@ -1,9 +1,7 @@
 from src.game import Game
 import sys
 
-# TODO:
-# improve method of storing map.
-# create mapping for asset image and block type
+# TODO:  improve method of storing map.
 
 if __name__ == '__main__':
     level_name = 'dev_lvl'
