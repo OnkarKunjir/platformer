@@ -1,6 +1,7 @@
 import configparser
 import os
 import random
+import noise
 from src.entity.block import Block
 from src.entity.animated_block import AnimatedBlock
 from src.entity.reward import Reward
@@ -96,11 +97,12 @@ class ChunkedMap:
                     for row in range(10):
                         x = i * self.chunk_pixel_width
                         for col in range(10):
-                            if y > 240:
+                            height = int(noise.pnoise1(x*0.01, repeat = 999999999) * 4)*20
+                            if y > 200 - height:
                                 self.chunks[(cx, cy)].append(
                                     self.get_entity(x, y, (20, 20), 1)
                                 )
-                            elif y == 240:
+                            elif y == 200 - height:
                                 self.chunks[(cx, cy)].append(
                                     self.get_entity(x, y, (20, 20), 2)
                                 )
