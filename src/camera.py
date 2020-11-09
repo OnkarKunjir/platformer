@@ -19,7 +19,10 @@ class Camera:
         self.y += (self.player.rect.y - self.y - self.fy)//self.smooth
 
     def translate(self, rect):
-        return (rect.x - self.x, rect.y - self.y, rect.width, rect.height)
+        return (int(rect.x - self.x), int(rect.y - self.y), rect.width, rect.height)
 
     def translate_xy(self, location):
-        return (location[0]-self.x, location[1]-self.y)
+        return (int(location[0]-self.x), int(location[1]-self.y))
+
+    def translate_distance(self, rect, distance_factor = 1):
+        return (int(rect.x - self.x * distance_factor), int(rect.y - self.y * distance_factor), rect.width, rect.height)

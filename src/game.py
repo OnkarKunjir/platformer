@@ -8,6 +8,7 @@ from src.camera import Camera
 from src.chunked_map import ChunkedMap
 from src.assets import Assets
 from src.partical_system import ParticleSystem
+from src.background import Background
 
 class Game:
     def __init__(self, level_name):
@@ -50,6 +51,7 @@ class Game:
         self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
         self.chunked_map = ChunkedMap(level_name, (2,3), (2,2))
         self.particle_system = ParticleSystem()
+        self.background = Background()
 
         # assets
         self.assets = Assets()
@@ -57,6 +59,12 @@ class Game:
         self.dirt_img = pygame.image.load('assets/images/dirt/0.png')
         self.grass_img = pygame.image.load('assets/images/grass/0.png')
         self.player_img = pygame.image.load('assets/images/player/0.png')
+        self.levle_1_img = pygame.image.load('assets/images/background/level1.png')
+        self.levle_1_img =  pygame.transform.scale(self.levle_1_img, (100, 300))
+
+        self.levle_2_img = pygame.image.load('assets/images/background/level2.png')
+        self.levle_2_img =  pygame.transform.scale(self.levle_2_img, (100, 300))
+
 
     def show_fps(self):
         text = self.font.render(str(int(self.clock.get_fps())), True, (255, 255, 255), (0, 0, 0))
@@ -130,9 +138,14 @@ class Game:
         function to draw elements of render screen.
         '''
         self.render_surface.fill((135, 206, 235))
+
+        # draw background
+        self.draw_background()
+
         #pygame.draw.rect(self.render_surface, (255,255,255), self.camera.translate(pygame.Rect(self.chunked_map.chunk_x*200, self.chunked_map.chunk_y*200, 200, 200)))
         self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
 
+        # draw tiles
         for tile in self.chunked_map.get_blocks():
             if isinstance(tile, Reward) and not tile.is_valid:
                 continue
@@ -150,6 +163,11 @@ class Game:
         self.show_fps()
         self.show_score()
 
+    def draw_background(self):
+        for i in self.background.level_2:
+            self.render_surface.blit(self.levle_2_img, self.camera.translate_distance(i.rect, self.background.levle_2_distance))
+        for i in self.background.level_1:
+            self.render_surface.blit(self.levle_1_img, self.camera.translate_distance(i.rect, self.background.levle_1_distance))
 
     def play(self):
         '''
