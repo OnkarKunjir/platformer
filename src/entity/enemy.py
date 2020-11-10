@@ -1,17 +1,13 @@
 import configparser
-from pygame import image
-import os
 from src.entity.entity import Entity, check_collision
 from src.entity.reward import Reward
 
-class Player(Entity):
-    '''
-    player extended form entity contains all state variables required by the player.
-    handels jumping and moving also.
-    '''
+class Enemy(Entity):
     def __init__(self, x, y, width, height, color):
         super().__init__(x, y, width, height)
+        self.velocity = [0, 0]
         self.color = color
+
         cfg = configparser.ConfigParser()
         cfg.read('config.ini')
 
@@ -36,7 +32,6 @@ class Player(Entity):
 
         self.direction = True # True / False = Right / Left
 
-
     def update_pos_from_collision(self, check_against, move, max_x = None, max_y = None):
         '''
         function updates the position of primary entity based on collision detection.
@@ -53,13 +48,8 @@ class Player(Entity):
 
         for i in colliding_entities:
             if isinstance(i, Reward):
-                if i.is_valid:
-                    score += i.score_gain
-                    if i.block_type == 3:
-                        i.is_valid = False
                 continue
-
-            elif move[0] > 0:
+            if move[0] > 0:
                 self.rect.right = i.rect.left
                 right = True
             else:
@@ -71,12 +61,8 @@ class Player(Entity):
 
         for i in colliding_entities:
             if isinstance(i, Reward):
-                if i.is_valid:
-                    score += i.score_gain
-                    if i.block_type == 3:
-                        i.is_valid = False
                 continue
-            elif move[1] > 0:
+            if move[1] > 0:
                 self.rect.bottom = i.rect.top
                 bottom = True
             else:
@@ -85,46 +71,35 @@ class Player(Entity):
 
         return left, right, top, bottom, score
 
-    def move(self, blocks):
-        '''
-        moves the player according to move_direction.
-        '''
+    def move(self, blocks, player):
         self.velocity[1] += self.GRAVITY
 
-        if self.move_direction['up'] and (not self.in_mid_air or self.jump_count < self.MAX_JUMP_COUNT):
-            self.velocity[1] = -self.JUMP_SPEED
-            self.jump_count += 1
-        self.move_direction['up'] = False
-
-        if self.move_direction['left']:
-            self.velocity[0] -= 3
-            self.direction = False
-        if self.move_direction['right']:
-            self.velocity[0] += 3
-            self.direction = True
-
-        if not self.move_direction['left'] and not self.move_direction['right']:
+        if abs(self.rect.x - player.rect.x) > 60:
+            if self.rect.x > player.rect.x:
+                self.velocity[0] -= 3
+            else:
+                self.velocity[0] += 3
+        else:
             self.velocity[0] = 0
+        if (self.rect.y > player.rect.y) and (not self.in_mid_air or self.jump_count < 2):
+            self.jump_count += 1
+            self.velocity[1] -= 2*self.JUMP_SPEED
 
-        for i in range(2):
-            if self.velocity[i] > self.MAX_VELOCITY[i]:
-                self.velocity[i] = self.MAX_VELOCITY[i]
-            elif self.velocity[i] < -self.MAX_VELOCITY[i]:
-                self.velocity[i] = -self.MAX_VELOCITY[i]
+        if self.velocity[0] > self.MAX_VELOCITY[0]:
+            self.velocity[0] = self.MAX_VELOCITY[0]
+        elif self.velocity[0] < -self.MAX_VELOCITY[0]:
+            self.velocity[0] = -self.MAX_VELOCITY[0]
 
-        #left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity, self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT)
+        if self.velocity[1] > self.MAX_VELOCITY[1]:
+            self.velocity[1] = self.MAX_VELOCITY[1]
+        elif self.velocity[1] < -self.MAX_VELOCITY[1]:
+            self.velocity[1] = -self.MAX_VELOCITY[1]
+
         left, right, top, bottom, score= self.update_pos_from_collision(blocks, self.velocity)
-        self.rect.x = max(0, self.rect.x)
-        self.rect.y = max(0, self.rect.y)
-        if top:
-            self.velocity[1] = 0
-
-        self.landed = False
-        if self.in_mid_air and bottom:
-            self.landed = True
 
         self.in_mid_air = not bottom
         if not self.in_mid_air:
             self.jump_count = 0
 
-        return score
+        if (left or right) and self.jump_count < self.MAX_JUMP_COUNT:
+            self.velocity[1] -= 2*self.JUMP_SPEED
