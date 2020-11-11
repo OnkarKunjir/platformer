@@ -76,6 +76,10 @@ class Game:
 
     def show_score(self):
         text = self.font.render(str(self.score), True, (255, 255, 255), (0, 0, 0))
+        self.render_surface.blit(text , (50 , 10))
+
+    def show_health(self):
+        text = self.font.render(str(self.player.health), True, (255, 255, 255), (0, 0, 0))
         self.render_surface.blit(text , (10 , 10))
 
     def event_handler(self):
@@ -152,8 +156,6 @@ class Game:
 
         pygame.draw.rect(self.render_surface, self.enemy.color, self.camera.translate(self.enemy.rect))
 
-
-
         # draw tiles
         for tile in self.chunked_map.get_blocks():
             if isinstance(tile, Reward) and not tile.is_valid:
@@ -171,6 +173,7 @@ class Game:
 
         self.show_fps()
         self.show_score()
+        self.show_health()
 
     def draw_background(self):
         for i in self.background.level_2:

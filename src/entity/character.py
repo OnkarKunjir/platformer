@@ -26,6 +26,7 @@ class Character(Entity):
         self.in_mid_air = False
         self.landed = False
         self.jump_count = 0
+        self.health = 100
 
         self.direction = True # True / False = Right / Left
 

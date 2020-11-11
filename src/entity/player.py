@@ -35,6 +35,7 @@ class Player(Character):
             if isinstance(i, Reward):
                 if i.is_valid:
                     score += i.score_gain
+                    self.health += i.health_gain
                     if i.block_type == 3:
                         i.is_valid = False
                 continue
@@ -53,6 +54,7 @@ class Player(Character):
             if isinstance(i, Reward):
                 if i.is_valid:
                     score += i.score_gain
+                    self.health += i.health_gain
                     if i.block_type == 3:
                         i.is_valid = False
                 continue

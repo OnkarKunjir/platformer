@@ -43,7 +43,7 @@ class ChunkedMap:
         if block_type == 3:
             return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, health_gain = 0, score_gain = 10)
         elif block_type == 4:
-            return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, health_gain = 0, score_gain = -10)
+            return Reward(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, health_gain = -5, score_gain = 0)
         elif block_type == 5:
             return AnimatedBlock(x = x, y = y, width = image_size[0], height = image_size[1], block_type = block_type, n_frames= 2)
         else:
@@ -85,6 +85,9 @@ class ChunkedMap:
         self.random_chunk()
 
     def random_chunk(self):
+        '''
+        function generates random chunks.
+        '''
         for i in range(self.chunk_x-self.xb, self.chunk_x+self.xf):
             for j in range(self.chunk_y-self.yb, self.chunk_y+self.yf):
                 x = i * self.chunk_pixel_width
@@ -106,6 +109,14 @@ class ChunkedMap:
                                 self.chunks[(cx, cy)].append(
                                     self.get_entity(x, y, (20, 20), 2)
                                 )
+                            elif y == 180 - height and random.random() < 0.2:
+                                self.chunks[(cx, cy)].append(
+                                    self.get_entity(x, y, (20, 20), 4)
+                                )
+                            elif abs(y - 180 - height) < 80 and random.random() < 0.05:
+                                self.chunks[(cx, cy)].append(
+                                    self.get_entity(x, y, (20, 20), 3)
+                                )
 
                             x += 20
                         y += 20
@@ -119,8 +130,6 @@ class ChunkedMap:
             return self.blocks_on_screen
         cx = self.chunk_x
         cy = self.chunk_y
-        #for i in range(cx-2, cx+3):
-        #    for j in range(cy-2, cy+2):
         for i in range(cx-self.xb, cx+self.xf):
             for j in range(cy-self.yb, cy+self.yf):
                 for c in self.chunks.get((i,j), []):

@@ -1,7 +1,9 @@
 from src.game import Game
 import sys
 
-# TODO:  improve method of storing map.
+# TODO:
+#       enable player attacking.
+#       reduce damage frequency.
 
 if __name__ == '__main__':
     level_name = 'dev_lvl'
