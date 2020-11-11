@@ -85,11 +85,7 @@ class Player(Character):
         if not self.move_direction['left'] and not self.move_direction['right']:
             self.velocity[0] = 0
 
-        for i in range(2):
-            if self.velocity[i] > self.MAX_VELOCITY[i]:
-                self.velocity[i] = self.MAX_VELOCITY[i]
-            elif self.velocity[i] < -self.MAX_VELOCITY[i]:
-                self.velocity[i] = -self.MAX_VELOCITY[i]
+        self.cap_velocity()
 
         left, right, top, bottom, score= self.update_pos_from_collision(blocks)
         # stop player from moving out of map.

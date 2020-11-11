@@ -30,18 +30,6 @@ class Character(Entity):
         self.direction = True # True / False = Right / Left
 
 
-    def update_pos_from_collision(self, check_against, move, max_x = None, max_y = None):
-        '''
-        function updates the position of primary entity based on collision detection.
-        '''
-        pass
-
-    def move(self, blocks):
-        '''
-        moves the character according to move_direction.
-        '''
-        pass
-
     def jump(self):
         '''
         make character jump.
@@ -50,3 +38,29 @@ class Character(Entity):
         if (self.jump_count < self.MAX_JUMP_COUNT) or not self.in_mid_air:
             self.velocity[1] = -self.JUMP_SPEED
             self.jump_count += 1
+
+    def cap_velocity(self):
+        '''
+        function to cap the velocity of character.
+        '''
+        if self.velocity[0] > self.MAX_VELOCITY[0]:
+            self.velocity[0] = self.MAX_VELOCITY[0]
+        elif self.velocity[0] < -self.MAX_VELOCITY[0]:
+            self.velocity[0] = -self.MAX_VELOCITY[0]
+
+        if self.velocity[1] > self.MAX_VELOCITY[1]:
+            self.velocity[1] = self.MAX_VELOCITY[1]
+        elif self.velocity[1] < -self.MAX_VELOCITY[1]:
+            self.velocity[1] = -self.MAX_VELOCITY[1]
+
+    def update_pos_from_collision(self):
+        '''
+        function updates the position of primary entity based on collision detection.
+        '''
+        pass
+
+    def move(self):
+        '''
+        moves the character according to move_direction.
+        '''
+        pass
