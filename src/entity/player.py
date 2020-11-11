@@ -1,48 +1,28 @@
-import configparser
-from pygame import image
-import os
-from src.entity.entity import Entity, check_collision
+from src.entity.entity import check_collision
+from src.entity.character import Character
 from src.entity.reward import Reward
 
-class Player(Entity):
+class Player(Character):
     '''
     player extended form entity contains all state variables required by the player.
     handels jumping and moving also.
     '''
-    def __init__(self, x, y, width, height, color):
+    def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
-        self.color = color
-        cfg = configparser.ConfigParser()
-        cfg.read('config.ini')
-
-        # constants
-        self.MAX_VELOCITY = ( float(cfg['DEFAULT']['MAX_VELOCITY_X']), float(cfg['DEFAULT']['MAX_VELOCITY_Y']) )
-        self.GRAVITY = float(cfg['DEFAULT']['GRAVITY'])
-        self.JUMP_SPEED = float(cfg['DEFAULT']['JUMP_SPEED'])
-        self.MAX_JUMP_COUNT = int(cfg['DEFAULT']['MAX_JUMP_COUNT'])
-
-        self.RENDER_SURFACE_WIDTH = int(cfg['DEFAULT']['RENDER_SURFACE_WIDTH'])
-        self.RENDER_SURFACE_HEIGHT = int(cfg['DEFAULT']['RENDER_SURFACE_HEIGHT'])
-        # player state.
-        self.velocity = [0, 0]
-        self.in_mid_air = False
-        self.landed = False
-        self.jump_count = 0
         self.move_direction = {
             'left' : False,
             'right' : False,
             'up' : False
         }
 
-        self.direction = True # True / False = Right / Left
 
-
-    def update_pos_from_collision(self, check_against, move, max_x = None, max_y = None):
+    def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
         '''
         function updates the position of primary entity based on collision detection.
         '''
 
         score = 0
+        move = self.velocity
         self.move_x(move[0])
         colliding_entities = check_collision(self, check_against, max_x, max_y)
 
@@ -92,15 +72,14 @@ class Player(Entity):
         self.velocity[1] += self.GRAVITY
 
         if self.move_direction['up'] and (not self.in_mid_air or self.jump_count < self.MAX_JUMP_COUNT):
-            self.velocity[1] = -self.JUMP_SPEED
-            self.jump_count += 1
+            self.jump()
         self.move_direction['up'] = False
 
         if self.move_direction['left']:
-            self.velocity[0] -= 3
+            self.velocity[0] -= self.VELOCITY_X_INC
             self.direction = False
         if self.move_direction['right']:
-            self.velocity[0] += 3
+            self.velocity[0] += self.VELOCITY_X_INC
             self.direction = True
 
         if not self.move_direction['left'] and not self.move_direction['right']:
@@ -112,11 +91,12 @@ class Player(Entity):
             elif self.velocity[i] < -self.MAX_VELOCITY[i]:
                 self.velocity[i] = -self.MAX_VELOCITY[i]
 
-        #left, right, top, bottom = update_pos_from_collision(self, blocks, self.velocity, self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT)
-        left, right, top, bottom, score= self.update_pos_from_collision(blocks, self.velocity)
+        left, right, top, bottom, score= self.update_pos_from_collision(blocks)
+        # stop player from moving out of map.
         self.rect.x = max(0, self.rect.x)
         self.rect.y = max(0, self.rect.y)
         if top:
+            # stop jumping if player collides his head on another entity.
             self.velocity[1] = 0
 
         self.landed = False

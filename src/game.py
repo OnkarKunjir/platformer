@@ -48,7 +48,7 @@ class Game:
         self.score = 0
 
         # game objects
-        self.player = Player(x = 10, y = 20, width = 20, height = 40, color = (255,255,255))
+        self.player = Player(x = 10, y = 20, width = 20, height = 40)
         self.enemy = Enemy(x = 100, y = 100, width = 20, height = 40, color = (255, 255, 255))
 
         self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
