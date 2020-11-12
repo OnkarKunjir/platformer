@@ -65,3 +65,10 @@ class Character(Entity):
         moves the character according to move_direction.
         '''
         pass
+
+
+    def attack(self):
+        '''
+        characters offensive move.
+        '''
+        pass

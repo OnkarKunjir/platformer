@@ -9,7 +9,7 @@ class Enemy(Character):
         self.JUMP_COOLDOWN = 15
 
         self.color = color
-        self.x_offset = 10
+        self.x_offset = 80
         self.first_jumped_ago = 0
 
     def update_pos_from_collision(self, check_against, max_x = None, max_y = None):

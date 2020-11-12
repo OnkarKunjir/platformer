@@ -104,6 +104,9 @@ class Game:
                 elif event.key == pygame.K_SPACE:
                     self.player.move_direction['up'] = True
 
+                elif event.key == pygame.K_h:
+                    self.player.move_direction['attack'] = True
+
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_a :
                     self.player.move_direction['left'] = False
@@ -121,6 +124,12 @@ class Game:
         for tile in tiles:
             if isinstance(tile, AnimatedEntity):
                 tile.update_frame()
+
+        if self.player.move_direction['attack']:
+            x = self.player.rect.x + self.player.rect.width if self.player.direction else self.player.rect.x
+            y = (self.player.rect.y + self.player.rect.height // 2) - 5
+
+            self.particle_system.add(x, y, 5, self.player.direction)
         self.score += self.player.move(tiles)
         self.enemy.move(tiles, self.player)
 
@@ -174,14 +183,30 @@ class Game:
         self.show_fps()
         self.show_score()
         self.show_health()
+        if self.player.attack_arc_end_deg != 300:
+            self.draw_attack_arc(self.player)
+
+
+    def draw_attack_arc(self, character):
+        x = character.rect.x
+        y = character.rect.y
+        width = character.rect.width
+        height = character.rect.height
+
+        if character.direction:
+            x -= 5
+        y += (height // 2) - 5
+        r = pygame.Rect(x, y, 40, 10)
+        pygame.draw.arc(self.render_surface, (255, 255, 255), self.camera.translate(r), 0.0174533*300, 0.0174533*character.attack_arc_end_deg, 5)
+        character.attack_arc_end_deg += 15
+        if character.attack_arc_end_deg > 460:
+            character.attack_arc_end_deg = 300
 
     def draw_background(self):
         for i in self.background.level_2:
             pygame.draw.rect(self.render_surface, (0, 220, 0), self.camera.translate_distance(i.rect, self.background.levle_2_distance))
-            #self.render_surface.blit(self.levle_2_img, self.camera.translate_distance(i.rect, self.background.levle_2_distance))
         for i in self.background.level_1:
             pygame.draw.rect(self.render_surface, (0, 160, 0), self.camera.translate_distance(i.rect, self.background.levle_1_distance))
-            #self.render_surface.blit(self.levle_1_img, self.camera.translate_distance(i.rect, self.background.levle_1_distance))
 
     def play(self):
         '''

@@ -12,9 +12,11 @@ class Player(Character):
         self.move_direction = {
             'left' : False,
             'right' : False,
-            'up' : False
+            'up' : False,
+            'attack' : False
         }
 
+        self.attack_arc_end_deg = 300
 
     def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
         '''
@@ -105,4 +107,10 @@ class Player(Character):
         if not self.in_mid_air:
             self.jump_count = 0
 
+        if self.move_direction['attack']:
+            self.move_direction['attack'] = False
+            self.attack()
         return score
+
+    def attack(self):
+        self.attack_arc_end_deg += 15
