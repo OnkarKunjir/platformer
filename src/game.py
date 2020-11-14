@@ -29,7 +29,7 @@ class Game:
         self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, 50 + self.RENDER_SURFACE_HEIGHT//2)
         self.GRAVITY = float(cfg['DEFAULT']['GRAVITY'])
 
-        self.PARTICLE_FRAME_GAP = 10
+        # self.PARTICLE_FRAME_GAP = 10
 
         # pygame related initalization
         pygame.init()
@@ -60,27 +60,7 @@ class Game:
         # assets
         self.assets = Assets()
         self.assets.load_assets()
-        self.dirt_img = pygame.image.load('assets/images/dirt/0.png')
-        self.grass_img = pygame.image.load('assets/images/grass/0.png')
-        self.player_img = pygame.image.load('assets/images/player/0.png')
-        self.levle_1_img = pygame.image.load('assets/images/background/level1.png')
-        self.levle_1_img =  pygame.transform.scale(self.levle_1_img, (100, 300))
 
-        self.levle_2_img = pygame.image.load('assets/images/background/level2.png')
-        self.levle_2_img =  pygame.transform.scale(self.levle_2_img, (100, 300))
-
-
-    def show_fps(self):
-        text = self.font.render(str(int(self.clock.get_fps())), True, (255, 255, 255), (0, 0, 0))
-        self.render_surface.blit(text , (470 , 10))
-
-    def show_score(self):
-        text = self.font.render(str(self.score), True, (255, 255, 255), (0, 0, 0))
-        self.render_surface.blit(text , (50 , 10))
-
-    def show_health(self):
-        text = self.font.render(str(self.player.health), True, (255, 255, 255), (0, 0, 0))
-        self.render_surface.blit(text , (10 , 10))
 
     def event_handler(self):
         '''
@@ -150,6 +130,39 @@ class Game:
         #    self.particle_system.add(x, y, 5, self.player.direction)
         self.particle_system.update()
 
+    # helper function to draw frame.
+    def draw_fps(self):
+        text = self.font.render(str(int(self.clock.get_fps())), True, (255, 255, 255), (0, 0, 0))
+        self.render_surface.blit(text , (470 , 10))
+
+    def draw_score(self):
+        text = self.font.render(str(self.score), True, (255, 255, 255), (0, 0, 0))
+        self.render_surface.blit(text , (50 , 10))
+
+    def draw_health(self):
+        text = self.font.render(str(self.player.health), True, (255, 255, 255), (0, 0, 0))
+        self.render_surface.blit(text , (10 , 10))
+
+    def draw_attack_arc(self, character):
+        x = character.rect.x
+        y = character.rect.y
+        width = character.rect.width
+        height = character.rect.height
+
+        if character.direction:
+            x -= 5
+        y += (height // 2) - 5
+        r = pygame.Rect(x, y, 40, 10)
+        pygame.draw.arc(self.render_surface, (255, 255, 255), self.camera.translate(r), 0.0174533*300, 0.0174533*character.attack_arc_end_deg, 5)
+        character.attack_arc_end_deg += 15
+        if character.attack_arc_end_deg > 460:
+            character.attack_arc_end_deg = 300
+
+    def draw_background(self):
+        for i in self.background.level_2:
+            pygame.draw.rect(self.render_surface, (0, 220, 0), self.camera.translate_distance(i.rect, self.background.levle_2_distance))
+        for i in self.background.level_1:
+            pygame.draw.rect(self.render_surface, (0, 160, 0), self.camera.translate_distance(i.rect, self.background.levle_1_distance))
 
     def draw_frame(self):
         '''
@@ -180,33 +193,13 @@ class Game:
                 continue
             pygame.draw.circle(self.render_surface, particle.color, self.camera.translate_xy(particle.center), particle.radius)
 
-        self.show_fps()
-        self.show_score()
-        self.show_health()
+        self.draw_fps()
+        self.draw_score()
+        self.draw_health()
         if self.player.attack_arc_end_deg != 300:
             self.draw_attack_arc(self.player)
 
 
-    def draw_attack_arc(self, character):
-        x = character.rect.x
-        y = character.rect.y
-        width = character.rect.width
-        height = character.rect.height
-
-        if character.direction:
-            x -= 5
-        y += (height // 2) - 5
-        r = pygame.Rect(x, y, 40, 10)
-        pygame.draw.arc(self.render_surface, (255, 255, 255), self.camera.translate(r), 0.0174533*300, 0.0174533*character.attack_arc_end_deg, 5)
-        character.attack_arc_end_deg += 15
-        if character.attack_arc_end_deg > 460:
-            character.attack_arc_end_deg = 300
-
-    def draw_background(self):
-        for i in self.background.level_2:
-            pygame.draw.rect(self.render_surface, (0, 220, 0), self.camera.translate_distance(i.rect, self.background.levle_2_distance))
-        for i in self.background.level_1:
-            pygame.draw.rect(self.render_surface, (0, 160, 0), self.camera.translate_distance(i.rect, self.background.levle_1_distance))
 
     def play(self):
         '''
