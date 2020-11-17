@@ -18,6 +18,10 @@ class Player(Character):
 
         self.attack_arc_end_deg = 300
 
+        self.VELOCITY_X_INC = 0.2
+        self.friction = 0.2
+        self.air_resistance = 0.05
+
     def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
         '''
         function updates the position of primary entity based on collision detection.
@@ -77,6 +81,7 @@ class Player(Character):
 
         if self.move_direction['up'] and (not self.in_mid_air or self.jump_count < self.MAX_JUMP_COUNT):
             self.jump()
+
         self.move_direction['up'] = False
 
         if self.move_direction['left']:
@@ -87,7 +92,14 @@ class Player(Character):
             self.direction = True
 
         if not self.move_direction['left'] and not self.move_direction['right']:
-            self.velocity[0] = 0
+            current_friction = self.air_resistance if self.in_mid_air else self.friction
+
+            if abs(self.velocity[0]) < 0.2:
+                self.velocity[0] = 0
+            elif self.velocity[0] > 0:
+                self.velocity[0] -= current_friction
+            else:
+                self.velocity[0] += current_friction
 
         self.cap_velocity()
 

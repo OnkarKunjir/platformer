@@ -51,10 +51,9 @@ class Enemy(Character):
         return left, right, top, bottom
 
     def move(self, blocks, player, translated_location):
-        # update velocity of enemy.
-
         tx, ty, _, _ = translated_location
         if tx < 0 or tx > self.RENDER_SURFACE_WIDTH or ty < 0 or ty > self.RENDER_SURFACE_HEIGHT:
+            # update postion if and only if enemy is within frame.
             return
 
         player_x = player.rect.x

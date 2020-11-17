@@ -9,7 +9,6 @@ from src.chunked_map import ChunkedMap
 from src.assets import Assets
 from src.partical_system import ParticleSystem
 from src.background import Background
-from src.entity.enemy import Enemy
 
 class Game:
     def __init__(self, level_name):
@@ -112,6 +111,7 @@ class Game:
             self.particle_system.add(x, y, 5, self.player.direction)
         self.score += self.player.move(tiles)
 
+        # update enemies postion.
         for enemy in self.enemies:
             enemy.move(tiles, self.player, self.camera.translate(enemy.rect))
 
@@ -122,14 +122,6 @@ class Game:
             self.particle_system.add(x, y, 3, True)
             self.particle_system.add(x, y, 3, False)
 
-        #if (not self.player.in_mid_air) and (self.frames > self.PARTICLE_FRAME_GAP) and (self.player.move_direction['left'] or self.player.move_direction['right']):
-        #    self.frames = 0
-        #    x = self.player.rect.x
-        #    y = self.player.rect.y + self.player.rect.height
-
-        #    if self.player.move_direction['left']:
-        #        x += self.player.rect.width
-        #    self.particle_system.add(x, y, 5, self.player.direction)
         self.particle_system.update()
 
     # helper function to draw frame.
