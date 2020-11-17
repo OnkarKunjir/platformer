@@ -1,6 +1,7 @@
 from src.entity.entity import check_collision
 from src.entity.character import Character
 from src.entity.reward import Reward
+import configparser
 
 class Player(Character):
     '''
@@ -16,11 +17,14 @@ class Player(Character):
             'attack' : False
         }
 
+        cfg = configparser.ConfigParser()
+        cfg.read('config.ini')
+
         self.attack_arc_end_deg = 300
 
-        self.VELOCITY_X_INC = 0.2
-        self.friction = 0.2
-        self.air_resistance = 0.05
+        self.VELOCITY_X_INC = float(cfg['PLAYER']['ACCELERATION'])
+        self.ground_friction = float(cfg['PLAYER']['GROUND_FRICTION'])
+        self.air_resistance = float(cfg['PLAYER']['AIR_RESISTANCE'])
 
     def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
         '''
@@ -92,9 +96,9 @@ class Player(Character):
             self.direction = True
 
         if not self.move_direction['left'] and not self.move_direction['right']:
-            current_friction = self.air_resistance if self.in_mid_air else self.friction
+            current_friction = self.air_resistance if self.in_mid_air else self.ground_friction
 
-            if abs(self.velocity[0]) < 0.2:
+            if abs(self.velocity[0]) < 0.1:
                 self.velocity[0] = 0
             elif self.velocity[0] > 0:
                 self.velocity[0] -= current_friction
