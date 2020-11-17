@@ -5,6 +5,7 @@ import noise
 from src.entity.block import Block
 from src.entity.animated_block import AnimatedBlock
 from src.entity.reward import Reward
+from src.entity.enemy import Enemy
 
 class ChunkedMap:
     '''
@@ -24,6 +25,7 @@ class ChunkedMap:
 
         self.level_name = level_name
         self.chunks = {}
+        self.special_entities = []
         self.chunk_pixel_width = CHUNK_SIZE * BLOCK_WIDTH
         self.chunk_pixel_height = CHUNK_SIZE * BLOCK_HEIGHT
         self.chunk_x = 0
@@ -64,13 +66,19 @@ class ChunkedMap:
                         for cell in row.strip().split(','):
                             cell = int(cell)
                             if cell > 0:
-                                cx = x//self.chunk_pixel_width
-                                cy = y//self.chunk_pixel_height
-                                if (cx, cy) not in self.chunks.keys():
-                                    self.chunks[(cx, cy)] = []
-                                self.chunks[(cx, cy)].append(
-                                    self.get_entity(x, y, image_size, cell)
-                                )
+                                if cell < 6:
+                                    cx = x//self.chunk_pixel_width
+                                    cy = y//self.chunk_pixel_height
+                                    if (cx, cy) not in self.chunks.keys():
+                                        self.chunks[(cx, cy)] = []
+                                    self.chunks[(cx, cy)].append(
+                                        self.get_entity(x, y, image_size, cell)
+                                    )
+                                else:
+                                    # cell is special entity (player or enemy something)
+                                    self.special_entities.append(
+                                        Enemy(x = x, y = y, width = 20, height = 40, color = (255, 255, 255))
+                                    )
                             x += image_size[0]
                         y += image_size[1]
 

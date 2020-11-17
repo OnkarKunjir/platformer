@@ -50,14 +50,19 @@ class Enemy(Character):
 
         return left, right, top, bottom
 
-    def move(self, blocks, player):
+    def move(self, blocks, player, translated_location):
         # update velocity of enemy.
-        self.velocity[1] += self.GRAVITY
+
+        tx, ty, _, _ = translated_location
+        if tx < 0 or tx > self.RENDER_SURFACE_WIDTH or ty < 0 or ty > self.RENDER_SURFACE_HEIGHT:
+            return
 
         player_x = player.rect.x
         player_y = player.rect.y
         enemy_x = self.rect.x
         enemy_y = self.rect.y
+
+        self.velocity[1] += self.GRAVITY
 
         if abs(enemy_x - player_x) > self.x_offset:
             if enemy_x > player_x:

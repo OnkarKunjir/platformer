@@ -49,13 +49,13 @@ class Game:
 
         # game objects
         self.player = Player(x = 10, y = 20, width = 20, height = 40)
-        self.enemy = Enemy(x = 100, y = 100, width = 20, height = 40, color = (255, 255, 255))
 
         self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
         self.chunked_map = ChunkedMap(level_name, (2,3), (2,2))
         self.particle_system = ParticleSystem()
         self.background = Background()
 
+        self.enemies = self.chunked_map.special_entities
 
         # assets
         self.assets = Assets()
@@ -111,7 +111,9 @@ class Game:
 
             self.particle_system.add(x, y, 5, self.player.direction)
         self.score += self.player.move(tiles)
-        self.enemy.move(tiles, self.player)
+
+        for enemy in self.enemies:
+            enemy.move(tiles, self.player, self.camera.translate(enemy.rect))
 
         # adding particles when player moves on the ground.
         if self.player.landed:
@@ -176,7 +178,8 @@ class Game:
         #pygame.draw.rect(self.render_surface, (255,255,255), self.camera.translate(pygame.Rect(self.chunked_map.chunk_x*200, self.chunked_map.chunk_y*200, 200, 200)))
         self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
 
-        pygame.draw.rect(self.render_surface, self.enemy.color, self.camera.translate(self.enemy.rect))
+        for enemy in self.enemies:
+            pygame.draw.rect(self.render_surface, enemy.color, self.camera.translate(enemy.rect))
 
         # draw tiles
         for tile in self.chunked_map.get_blocks():
