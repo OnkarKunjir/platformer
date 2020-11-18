@@ -4,7 +4,6 @@ import sys
 # TODO:
 #       enable player attacking.
 #       reduce damage frequency.
-#       add momentun to characters.
 
 
 if __name__ == '__main__':

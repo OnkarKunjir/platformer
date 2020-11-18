@@ -26,6 +26,11 @@ class Player(Character):
         self.ground_friction = float(cfg['PLAYER']['GROUND_FRICTION'])
         self.air_resistance = float(cfg['PLAYER']['AIR_RESISTANCE'])
 
+        self.damage_cooldown = 40
+        self.read_to_take_damage = True
+        self.frame_count = 0
+        self.frame_count_cap = 100
+
     def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
         '''
         function updates the position of primary entity based on collision detection.
@@ -45,7 +50,13 @@ class Player(Character):
             if isinstance(i, Reward):
                 if i.is_valid:
                     score += i.score_gain
-                    self.health += i.health_gain
+                    if i.health_gain < 0:
+                        if self.read_to_take_damage:
+                            # if reward is going to damage wait till cooldown.
+                            self.read_to_take_damage = False
+                            self.health += i.health_gain
+                    else:
+                        self.health += i.health_gain
                     if i.block_type == 3:
                         i.is_valid = False
                 continue
@@ -64,7 +75,13 @@ class Player(Character):
             if isinstance(i, Reward):
                 if i.is_valid:
                     score += i.score_gain
-                    self.health += i.health_gain
+                    if i.health_gain < 0:
+                        if self.read_to_take_damage:
+                            # if reward is going to damage wait till cooldown.
+                            self.read_to_take_damage = False
+                            self.health += i.health_gain
+                    else:
+                        self.health += i.health_gain
                     if i.block_type == 3:
                         i.is_valid = False
                 continue
@@ -81,6 +98,13 @@ class Player(Character):
         '''
         moves the player according to move_direction.
         '''
+        self.frame_count += 1
+        if self.frame_count > self.frame_count_cap:
+            self.frame_count = 0
+
+        if self.frame_count % self.damage_cooldown == 0:
+            self.read_to_take_damage = True
+
         self.velocity[1] += self.GRAVITY
 
         if self.move_direction['up'] and (not self.in_mid_air or self.jump_count < self.MAX_JUMP_COUNT):
