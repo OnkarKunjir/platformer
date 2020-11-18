@@ -91,6 +91,7 @@ class Player(Character):
         if self.frame_count % self.damage_cooldown == 0:
             self.read_to_take_damage = True
 
+        # update velocity of player.
         self.velocity[1] += self.GRAVITY
 
         if self.move_direction['up'] and (not self.in_mid_air or self.jump_count < self.MAX_JUMP_COUNT):
@@ -116,6 +117,10 @@ class Player(Character):
                 self.velocity[0] += current_friction
 
         self.cap_velocity()
+
+        if self.health == 0:
+            # if player is dead make horizontal velocity zero.
+            self.velocity[0] = 0
 
         left, right, top, bottom, score= self.update_pos_from_collision(blocks)
         # stop player from moving out of map.

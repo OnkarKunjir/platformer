@@ -86,6 +86,10 @@ class Game:
                 elif event.key == pygame.K_h:
                     self.player.move_direction['attack'] = True
 
+                elif event.key == pygame.K_k:
+                    #NOTE: testing purpose only
+                    self.player.health = 0
+
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_a :
                     self.player.move_direction['left'] = False
@@ -133,9 +137,16 @@ class Game:
         text = self.font.render(str(self.score), True, (255, 255, 255), (0, 0, 0))
         self.render_surface.blit(text , (50 , 10))
 
-    def draw_health(self):
-        text = self.font.render(str(self.player.health), True, (255, 255, 255), (0, 0, 0))
-        self.render_surface.blit(text , (10 , 10))
+    def draw_health_bar(self):
+        health = self.player.health
+        pygame.draw.rect(self.render_surface, (0, 0, 0), (19, 11, 102, 7))
+        if health > 60:
+            pygame.draw.rect(self.render_surface, (0, 255, 0), (20, 12, health, 5))
+        elif health > 40:
+            pygame.draw.rect(self.render_surface, (200, 255, 0), (20, 12, health, 5))
+        else:
+            pygame.draw.rect(self.render_surface, (200, 100, 0), (20, 12, health, 5))
+
 
     def draw_attack_arc(self, character):
         x = character.rect.x
@@ -189,8 +200,8 @@ class Game:
             pygame.draw.circle(self.render_surface, particle.color, self.camera.translate_xy(particle.center), particle.radius)
 
         self.draw_fps()
-        self.draw_score()
-        self.draw_health()
+        #self.draw_score()
+        self.draw_health_bar()
         if self.player.attack_arc_end_deg != 300:
             self.draw_attack_arc(self.player)
 

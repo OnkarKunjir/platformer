@@ -3,7 +3,6 @@ import sys
 
 # TODO:
 #       enable player attacking.
-#       reduce damage frequency.
 
 
 if __name__ == '__main__':
