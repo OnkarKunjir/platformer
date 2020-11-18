@@ -20,7 +20,6 @@ class Character(Entity):
         self.RENDER_SURFACE_WIDTH = int(cfg['DEFAULT']['RENDER_SURFACE_WIDTH'])
         self.RENDER_SURFACE_HEIGHT = int(cfg['DEFAULT']['RENDER_SURFACE_HEIGHT'])
 
-        self.VELOCITY_X_INC = 3 # can be redifined according to character.
         # character state.
         self.velocity = [0, 0]
         self.in_mid_air = False
@@ -30,6 +29,12 @@ class Character(Entity):
 
         self.direction = True # True / False = Right / Left
 
+        # following parameters can be changed by the derived classes
+        self.VELOCITY_X_INC = 3
+        self.damage_cooldown = 40
+        self.read_to_take_damage = True
+        self.frame_count = 0
+        self.frame_count_cap = 100
 
     def jump(self):
         '''
@@ -53,6 +58,22 @@ class Character(Entity):
             self.velocity[1] = self.MAX_VELOCITY[1]
         elif self.velocity[1] < -self.MAX_VELOCITY[1]:
             self.velocity[1] = -self.MAX_VELOCITY[1]
+
+    def take_damage(self, damage):
+        '''
+        !IMPORTANT: function expects parameters to be handled by the derived classes.
+        function to receive damage from outside entity.
+        damage is added hence it can process reward too.
+        if +ve damage is provided it is added to health wihtout any restriction.
+        '''
+        if damage < 0:
+            if self.read_to_take_damage:
+                self.read_to_take_damage = False
+                self.health += damage
+                self.health = max(0, self.health)
+        else:
+            self.health += damage
+            self.health = min(100, self.health)
 
     def update_pos_from_collision(self):
         '''

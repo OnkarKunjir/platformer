@@ -26,10 +26,6 @@ class Player(Character):
         self.ground_friction = float(cfg['PLAYER']['GROUND_FRICTION'])
         self.air_resistance = float(cfg['PLAYER']['AIR_RESISTANCE'])
 
-        self.damage_cooldown = 40
-        self.read_to_take_damage = True
-        self.frame_count = 0
-        self.frame_count_cap = 100
 
     def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
         '''
@@ -50,13 +46,7 @@ class Player(Character):
             if isinstance(i, Reward):
                 if i.is_valid:
                     score += i.score_gain
-                    if i.health_gain < 0:
-                        if self.read_to_take_damage:
-                            # if reward is going to damage wait till cooldown.
-                            self.read_to_take_damage = False
-                            self.health += i.health_gain
-                    else:
-                        self.health += i.health_gain
+                    self.take_damage(i.health_gain)
                     if i.block_type == 3:
                         i.is_valid = False
                 continue
@@ -75,13 +65,7 @@ class Player(Character):
             if isinstance(i, Reward):
                 if i.is_valid:
                     score += i.score_gain
-                    if i.health_gain < 0:
-                        if self.read_to_take_damage:
-                            # if reward is going to damage wait till cooldown.
-                            self.read_to_take_damage = False
-                            self.health += i.health_gain
-                    else:
-                        self.health += i.health_gain
+                    self.take_damage(i.health_gain)
                     if i.block_type == 3:
                         i.is_valid = False
                 continue
@@ -94,8 +78,10 @@ class Player(Character):
 
         return left, right, top, bottom, score
 
-    def move(self, blocks):
+    def move(self, blocks, enemies):
         '''
+        blocks = static blocks for collision detection and reward
+        enemies = characters to process when attack is done.
         moves the player according to move_direction.
         '''
         self.frame_count += 1
@@ -143,14 +129,18 @@ class Player(Character):
         if self.in_mid_air and bottom:
             self.landed = True
 
+        if self.in_mid_air and (right or left):
+            self.velocity[0] = 0
+
         self.in_mid_air = not bottom
         if not self.in_mid_air:
             self.jump_count = 0
 
         if self.move_direction['attack']:
             self.move_direction['attack'] = False
-            self.attack()
+            self.attack(enemies)
         return score
 
-    def attack(self):
+    def attack(self, enemies):
         self.attack_arc_end_deg += 15
+        # make enemies suffer.

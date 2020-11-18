@@ -109,7 +109,7 @@ class Game:
             y = (self.player.rect.y + self.player.rect.height // 2) - 5
 
             self.particle_system.add(x, y, 5, self.player.direction)
-        self.score += self.player.move(tiles)
+        self.score += self.player.move(tiles, self.enemies)
 
         # update enemies postion.
         for enemy in self.enemies:
