@@ -175,7 +175,7 @@ class Game:
 
         if character.direction:
             x -= 5
-        y += (height // 2) - 5
+        y += 15
         r = pygame.Rect(x, y, 40, 10)
         pygame.draw.arc(self.render_surface, (255, 255, 255), self.camera.translate(r), 0.0174533*300, 0.0174533*character.attack_arc_end_deg, 5)
         character.attack_arc_end_deg += 15

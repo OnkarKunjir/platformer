@@ -41,6 +41,9 @@ class Character(Entity):
         make character jump.
         class expects children classes to handel the state of in_mid_air and jump_count.
         '''
+        if self.health == 0:
+            return
+
         if (self.jump_count < self.MAX_JUMP_COUNT) or not self.in_mid_air:
             self.velocity[1] = -self.JUMP_SPEED
             self.jump_count += 1

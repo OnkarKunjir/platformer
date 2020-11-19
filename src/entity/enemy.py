@@ -76,6 +76,7 @@ class Enemy(Character):
         return left, right, top, bottom
 
     def move(self, blocks, comrades, player, translated_location):
+        self.read_to_take_damage = True
         tx, ty, _, _ = translated_location
         if tx < 0 or tx > self.RENDER_SURFACE_WIDTH or ty < 0 or ty > self.RENDER_SURFACE_HEIGHT:
             # update postion if and only if enemy is within frame.
@@ -100,6 +101,10 @@ class Enemy(Character):
             self.jump()
 
         self.cap_velocity()
+        if self.health == 0:
+            # if i'm ded I ain't movin bro
+            self.velocity[0] = 0
+
         blocks = blocks + comrades
         left, right, top, bottom = self.update_pos_from_collision(blocks)
         self.in_mid_air = not bottom
