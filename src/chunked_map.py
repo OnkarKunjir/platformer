@@ -82,6 +82,9 @@ class ChunkedMap:
                             x += image_size[0]
                         y += image_size[1]
 
+                # convering list into tuples
+                for key in self.chunks.keys():
+                    self.chunks[key] = tuple(self.chunks[key])
     def update(self, px, py):
         '''
         update chunk index based on players position.
@@ -91,6 +94,7 @@ class ChunkedMap:
         self.chunk_y = py//self.chunk_pixel_height
         self.blocks_on_screen = []
         self.random_chunk()
+
 
     def random_chunk(self):
         '''
@@ -130,6 +134,21 @@ class ChunkedMap:
                         y += 20
 
 
+    def is_enemy_in_frame(self, enemy):
+
+        cx = enemy.rect.x//self.chunk_pixel_width
+        cy = enemy.rect.y//self.chunk_pixel_height
+
+        if self.chunk_x - self.xb <= cx <= self.chunk_x + self.xf:
+            if self.chunk_y - self.yb <= cy <= self.chunk_y + self.yf:
+                return True
+        return False
+
+    def get_special_entities_on_screen(self):
+        entities_on_screen = filter(self.is_enemy_in_frame, self.special_entities)
+        return entities_on_screen
+
+
     def get_blocks(self):
         '''
         returns list of blocks visible on the screen.
@@ -143,4 +162,5 @@ class ChunkedMap:
                 for c in self.chunks.get((i,j), []):
                     self.blocks_on_screen.append(c)
 
+        self.blocks_on_screen = tuple(self.blocks_on_screen)
         return self.blocks_on_screen

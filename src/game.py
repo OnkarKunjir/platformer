@@ -54,7 +54,7 @@ class Game:
         self.particle_system = ParticleSystem()
         self.background = Background()
 
-        self.enemies = self.chunked_map.special_entities
+        self.enemies = None
 
         # assets
         self.assets = Assets()
@@ -103,6 +103,8 @@ class Game:
         '''
         self.camera.follow()
         self.chunked_map.update(self.player.rect.x, self.player.rect.y)
+        self.enemies = tuple(self.chunked_map.get_special_entities_on_screen())
+
         tiles = self.chunked_map.get_blocks()
         for tile in tiles:
             if isinstance(tile, AnimatedEntity):
@@ -168,19 +170,25 @@ class Game:
         self.draw_health_bar(enemy.health // 2, x, y, max_health = 50, thickness = 2, translate = True)
 
     def draw_attack_arc(self, character):
+        # NOTE: figure out better way to do this.
         x = character.rect.x
-        y = character.rect.y
+        y = character.rect.y + 15
         width = character.rect.width
         height = character.rect.height
 
-        if character.direction:
-            x -= 5
-        y += 15
+        arc_surface = pygame.Surface((40, 10))
         r = pygame.Rect(x, y, 40, 10)
-        pygame.draw.arc(self.render_surface, (255, 255, 255), self.camera.translate(r), 0.0174533*300, 0.0174533*character.attack_arc_end_deg, 5)
+
+        pygame.draw.arc(arc_surface, (255, 255, 255), (0, 0, 40, 10), 0.0174533*300, 0.0174533*character.attack_arc_end_deg, 5)
         character.attack_arc_end_deg += 15
         if character.attack_arc_end_deg > 460:
             character.attack_arc_end_deg = 300
+        arc_surface.set_colorkey((0, 0, 0))
+        if not character.direction:
+            arc_surface = pygame.transform.flip(arc_surface, True, False)
+            r.x -= character.rect.width
+
+        self.render_surface.blit(arc_surface, self.camera.translate(r))
 
     def draw_background(self):
         for i in self.background.level_2:

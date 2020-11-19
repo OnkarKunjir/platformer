@@ -1,7 +1,6 @@
 from src.entity.entity import check_collision
 from src.entity.character import Character
 from src.entity.reward import Reward
-import random
 
 class Enemy(Character):
     def __init__(self, x, y, width, height, color):
