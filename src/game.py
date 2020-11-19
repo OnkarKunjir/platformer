@@ -117,7 +117,7 @@ class Game:
 
         # update enemies postion.
         for enemy in self.enemies:
-            enemy.move(tiles, self.player, self.camera.translate(enemy.rect))
+            enemy.move(tiles, self.enemies, self.player, self.camera.translate(enemy.rect))
 
         # adding particles when player moves on the ground.
         if self.player.landed:
@@ -137,16 +137,35 @@ class Game:
         text = self.font.render(str(self.score), True, (255, 255, 255), (0, 0, 0))
         self.render_surface.blit(text , (50 , 10))
 
-    def draw_health_bar(self):
-        health = self.player.health
-        pygame.draw.rect(self.render_surface, (0, 0, 0), (19, 11, 102, 7))
-        if health > 60:
-            pygame.draw.rect(self.render_surface, (0, 255, 0), (20, 12, health, 5))
-        elif health > 40:
-            pygame.draw.rect(self.render_surface, (200, 255, 0), (20, 12, health, 5))
+    def draw_health_bar(self, health, x, y, max_health = 100, thickness = 5, translate = False):
+        if translate:
+            pygame.draw.rect(self.render_surface, (0, 0, 0), self.camera.translate(pygame.Rect(x - 1, y - 1, max_health + 2, thickness + 2)))
         else:
-            pygame.draw.rect(self.render_surface, (200, 100, 0), (20, 12, health, 5))
+            pygame.draw.rect(self.render_surface, (0, 0, 0), (x - 1, y - 1, max_health + 2, thickness + 2))
 
+        color = None
+        rect = pygame.Rect(x, y, health, thickness)
+        if health > max_health * 0.6:
+            color = (0, 255, 0)
+        elif health > max_health * 0.4:
+            color = (200, 255, 0)
+        else:
+            color = (200, 100, 0)
+
+        if translate:
+            pygame.draw.rect(self.render_surface, color, self.camera.translate(rect))
+        else:
+            pygame.draw.rect(self.render_surface, color, rect)
+
+    def draw_player_health(self):
+        self.draw_health_bar(self.player.health, 20, 12)
+
+    def draw_enemy_health(self, enemy):
+        x = enemy.rect.x
+        y = enemy.rect.y
+        y -= 15
+        x -= 12
+        self.draw_health_bar(enemy.health // 2, x, y, max_health = 50, thickness = 2, translate = True)
 
     def draw_attack_arc(self, character):
         x = character.rect.x
@@ -183,6 +202,7 @@ class Game:
 
         for enemy in self.enemies:
             pygame.draw.rect(self.render_surface, enemy.color, self.camera.translate(enemy.rect))
+            self.draw_enemy_health(enemy)
 
         # draw tiles
         for tile in self.chunked_map.get_blocks():
@@ -201,7 +221,7 @@ class Game:
 
         self.draw_fps()
         #self.draw_score()
-        self.draw_health_bar()
+        self.draw_player_health()
         if self.player.attack_arc_end_deg != 300:
             self.draw_attack_arc(self.player)
 

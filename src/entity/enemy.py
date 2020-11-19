@@ -1,6 +1,7 @@
 from src.entity.entity import check_collision
 from src.entity.character import Character
 from src.entity.reward import Reward
+import random
 
 class Enemy(Character):
     def __init__(self, x, y, width, height, color):
@@ -28,6 +29,18 @@ class Enemy(Character):
         for i in colliding_entities:
             if isinstance(i, Reward):
                 continue
+
+            if isinstance(i, Enemy):
+                if i == self:
+                    continue
+                if move[0] > 0:
+                    self.rect.right = i.rect.left - 10
+                    right = True
+                else:
+                    self.rect.left = i.rect.right + 10
+                    left = True
+                continue
+
             if move[0] > 0:
                 self.rect.right = i.rect.left
                 right = True
@@ -41,6 +54,18 @@ class Enemy(Character):
         for i in colliding_entities:
             if isinstance(i, Reward):
                 continue
+
+            if isinstance(i, Enemy):
+                if i == self:
+                    continue
+                if move[1] > 0:
+                    self.rect.bottom = i.rect.top - 10
+                    bottom = True
+                else:
+                    self.rect.top = i.rect.bottom + 10
+                    top = True
+                continue
+
             if move[1] > 0:
                 self.rect.bottom = i.rect.top
                 bottom = True
@@ -50,7 +75,7 @@ class Enemy(Character):
 
         return left, right, top, bottom
 
-    def move(self, blocks, player, translated_location):
+    def move(self, blocks, comrades, player, translated_location):
         tx, ty, _, _ = translated_location
         if tx < 0 or tx > self.RENDER_SURFACE_WIDTH or ty < 0 or ty > self.RENDER_SURFACE_HEIGHT:
             # update postion if and only if enemy is within frame.
@@ -75,6 +100,7 @@ class Enemy(Character):
             self.jump()
 
         self.cap_velocity()
+        blocks = blocks + comrades
         left, right, top, bottom = self.update_pos_from_collision(blocks)
         self.in_mid_air = not bottom
 
@@ -88,3 +114,5 @@ class Enemy(Character):
 
         if top:
             self.velocity[1] = 0
+        if left or right:
+            self.velocity[0] = 0
