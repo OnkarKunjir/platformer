@@ -1,7 +1,7 @@
 from src.game import Game
 import sys
 
-# TODO: make enemies attack the player.
+# TODO: make bot more smort.
 
 
 if __name__ == '__main__':

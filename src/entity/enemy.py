@@ -11,6 +11,7 @@ class Enemy(Character):
         self.color = color
         self.x_offset = 80
         self.first_jumped_ago = 0
+        self.attack_arc_end_deg = 0
 
     def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
         '''
@@ -91,10 +92,13 @@ class Enemy(Character):
         if abs(enemy_x - player_x) > self.x_offset:
             if enemy_x > player_x:
                 self.velocity[0] -= self.VELOCITY_X_INC
+                self.direction = False
             elif enemy_x < player_x:
                 self.velocity[0] += self.VELOCITY_X_INC
+                self.direction = True
         else:
             self.velocity[0] = 0
+            self.attack(player)
 
         if (enemy_y > player_y) and (self.first_jumped_ago == 0):
             self.jump()
@@ -120,3 +124,23 @@ class Enemy(Character):
             self.velocity[1] = 0
         if left or right:
             self.velocity[0] = 0
+
+
+    def attack(self, player):
+        self.attack_arc_end_deg += 15
+        x_start = None
+        x_end = None
+        y_start = y_end  = self.rect.y + 15
+
+
+        if self.direction:
+            # looking right
+            x_start = self.rect.x + self.rect.width
+            x_end = x_start + 20
+        else:
+            # looking left
+            x_start = self.rect.x
+            x_end = x_start - 20
+
+        if len(player.rect.clipline(x_start, y_start, x_end, y_end)) > 0:
+            player.take_damage(-10)

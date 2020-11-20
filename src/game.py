@@ -240,6 +240,11 @@ class Game:
         if self.player.attack_arc_end_deg != 300:
             self.draw_attack_arc(self.player)
 
+        for enemy in self.enemies:
+            if enemy.attack_arc_end_deg != 300:
+                self.draw_attack_arc(enemy)
+
+
 
 
     def play(self):
