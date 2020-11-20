@@ -6,7 +6,15 @@ class Character(Entity):
     character extended form entity contains all state variables required by
     any movable or controlleable entity in gmae (player/enemy).
     '''
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, state_n_frames = None, update_per_frame = 10):
+        '''
+        x, y = initaial postion
+        height, width you know this boi.
+
+        pass this if the character is to be animated.
+        state_n_frames = dict('state_name' : (int) n_frames)
+        update_per_frame = (int) when to update the frame.
+        '''
         super().__init__(x, y, width, height)
         cfg = configparser.ConfigParser()
         cfg.read('config.ini')
@@ -36,6 +44,16 @@ class Character(Entity):
         self.frame_count = 0
         self.frame_count_cap = 100
 
+
+        # animation variables
+        # NOTE: character animation is different form entity animation
+        # character has state hance create new thing..
+        self.state_n_frames = state_n_frames
+        self.frame_count = 0
+        self.current_state = 'ideal'
+        self.current_frame = 0
+        self.update_per_frame = update_per_frame
+
     def jump(self):
         '''
         make character jump.
@@ -64,7 +82,7 @@ class Character(Entity):
 
     def take_damage(self, damage):
         '''
-        !IMPORTANT: function expects parameters to be handled by the derived classes.
+        NOTE: function expects parameters to be handled by the derived classes.
         function to receive damage from outside entity.
         damage is added hence it can process reward too.
         if +ve damage is provided it is added to health wihtout any restriction.
@@ -77,6 +95,31 @@ class Character(Entity):
         else:
             self.health += damage
             self.health = min(100, self.health)
+
+    def update_state(self):
+        self.frame_count += 1
+        if self.frame_count < self.update_per_frame:
+            return
+
+        self.frame_count = 0
+        new_state = None
+        if self.in_mid_air:
+           new_state = 'jumping'
+        elif  self.velocity[0] == 0:
+            new_state = 'ideal'
+        else:
+            new_state = 'running'
+
+        if new_state == self.current_state:
+            # if state is same then move to next frame in same state.
+            self.current_frame += 1
+            if self.current_frame == self.state_n_frames[new_state]:
+                self.current_frame = 0
+        else:
+            # if state is changed then swithch to new states first frame.
+            self.current_state = new_state
+            self.current_frame = 0
+
 
     def update_pos_from_collision(self):
         '''

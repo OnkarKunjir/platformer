@@ -45,10 +45,12 @@ class Game:
         self.score = 0
 
         # game objects
-        self.player = Player(x = 10, y = 20, width = 20, height = 40)
+        # self.player = Player(x = 10, y = 20, width = 20, height = 40)
+
+        self.chunked_map = ChunkedMap(level_name, (2,3), (2,2))
+        self.player = self.chunked_map.player
 
         self.camera = Camera(self.player, fx = self.RENDER_SURFACE_MIDPOINT[0], fy = self.RENDER_SURFACE_MIDPOINT[1], smooth = 20)
-        self.chunked_map = ChunkedMap(level_name, (2,3), (2,2))
         self.particle_system = ParticleSystem()
         self.background = Background()
 
@@ -119,6 +121,7 @@ class Game:
 
 
         self.score += self.player.move(tiles, self.enemies)
+        self.player.update_state()
 
         # update enemies postion.
         for enemy in self.enemies:
@@ -209,7 +212,8 @@ class Game:
         self.draw_background()
 
         #pygame.draw.rect(self.render_surface, (255,255,255), self.camera.translate(pygame.Rect(self.chunked_map.chunk_x*200, self.chunked_map.chunk_y*200, 200, 200)))
-        self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
+        # self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
+        self.render_surface.blit(self.assets.get_character_image(self.player), self.camera.translate(self.player.rect))
 
         for enemy in self.enemies:
             pygame.draw.rect(self.render_surface, enemy.color, self.camera.translate(enemy.rect))

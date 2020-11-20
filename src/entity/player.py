@@ -8,8 +8,18 @@ class Player(Character):
     player extended form entity contains all state variables required by the player.
     handels jumping and moving also.
     '''
-    def __init__(self, x, y, width, height):
-        super().__init__(x, y, width, height)
+    def __init__(self, x, y, width, height, update_per_frame = 10):
+        cfg = configparser.ConfigParser()
+        cfg.read('config.ini')
+
+        frame_mapping_cfg = cfg['PLAYER_FRAME_MAPPING']
+        state_n_frames = {
+            'ideal' : int(frame_mapping_cfg['IDEAL']),
+            'running' : int(frame_mapping_cfg['RUNNING']),
+            'jumping' : int(frame_mapping_cfg['JUMPING'])
+        }
+
+        super().__init__(x, y, width, height, state_n_frames, update_per_frame)
         self.move_direction = {
             'left' : False,
             'right' : False,
@@ -17,8 +27,6 @@ class Player(Character):
             'attack' : False
         }
 
-        cfg = configparser.ConfigParser()
-        cfg.read('config.ini')
 
         self.attack_arc_end_deg = 300
 

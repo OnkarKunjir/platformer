@@ -16,13 +16,6 @@ class Assets():
 
         self.static_blocks = {}
         self.animated_blocks = {}
-        self.player = {
-            'left' : {},
-            'right' : {}
-        }
-
-        self.player['left']['ideal'] = []
-        self.player['right']['ideal'] = []
 
         self.image_asset_base_dir = 'assets/images/'
 
@@ -52,15 +45,39 @@ class Assets():
 
     def load_player_assets(self, default_player_direction = True):
         # player direction True/False = Right/Left
-        player_asset_dir = os.path.join(self.image_asset_base_dir, 'player')
+        self.player = self.load_character_assets(os.path.join(self.image_asset_base_dir, 'player'))
 
-        for frame_name in os.listdir(player_asset_dir):
-            frame_path = os.path.join(player_asset_dir, frame_name)
-            frame = image.load(frame_path)
-            self.player['right']['ideal'].append(frame)
-            self.player['left']['ideal'].append( transform.flip(frame, True, False)  )
+    def load_character_assets(self, base_path):
+        '''
+        function loads asset for character.
+        returns asset dict.
+        '''
+        asset_dict = {
+            'left' : {},
+            'right' : {}
+        }
 
+        if os.path.exists(base_path):
+            character_states = os.listdir(base_path)
+            for state in character_states:
+                state_path = os.path.join(base_path, state)
 
+                asset_dict['left'][state] = []
+                asset_dict['right'][state] = []
+
+                # loading frames for each state
+                for frame_name in sorted(os.listdir(state_path)):
+                    frame_path = os.path.join(state_path, frame_name)
+
+                    frame = image.load(frame_path)
+                    asset_dict['right'][state].append(frame)
+                    asset_dict['left'][state].append( transform.flip(frame, True, False)  )
+
+                # converting list into tuple.
+                asset_dict['left'][state] = tuple(asset_dict['left'][state])
+                asset_dict['right'][state] = tuple(asset_dict['right'][state])
+        return asset_dict
+                
 
     def get_static_block_image(self, block_type):
         return self.static_blocks[block_type]
@@ -76,3 +93,7 @@ class Assets():
     def get_player_image(self, direction):
         direction = 'right' if direction else 'left'
         return self.player[direction]['ideal'][0]
+
+    def get_character_image(self, character):
+        direction = 'right' if character.direction else 'left'
+        return self.player[direction][character.current_state][character.current_frame]
