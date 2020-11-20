@@ -49,7 +49,6 @@ class Character(Entity):
         # NOTE: character animation is different form entity animation
         # character has state hance create new thing..
         self.state_n_frames = state_n_frames
-        self.frame_count = 0
         self.current_state = 'ideal'
         self.current_frame = 0
         self.update_per_frame = update_per_frame
@@ -98,10 +97,12 @@ class Character(Entity):
 
     def update_state(self):
         self.frame_count += 1
-        if self.frame_count < self.update_per_frame:
+        if self.frame_count > self.frame_count_cap:
+            self.frame_count = 0
+
+        if self.frame_count % self.update_per_frame != 0:
             return
 
-        self.frame_count = 0
         new_state = None
         if self.in_mid_air:
            new_state = 'jumping'
