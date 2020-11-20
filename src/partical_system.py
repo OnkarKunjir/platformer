@@ -1,5 +1,4 @@
 import random
-# TODO: make add particle function more flexible.
 class Particle:
     def __init__(self, x, y, radius, vx, vy, color = (255, 255, 255)):
         '''
@@ -12,8 +11,8 @@ class Particle:
 
         self.vx = vx
         self.vy = vy
-        self.gravity = 0.07 * abs(vy)
-        self.shrink_rate = radius * 0.03
+        self.gravity = 0.2
+        self.shrink_rate = 0.2 + radius * 0.02
 
     def update(self):
         self.center[0] += self.vx
@@ -34,23 +33,30 @@ class ParticleSystem:
         for particle in self.particles:
             particle.update()
 
-    def add(self, x, y, n = 1, direction = True):
+    def add(self, x, y, n = 1, velocity_x = 0, velocity_y = 0, min_size = 5, max_size = 8):
         '''
         adds atmost n and at lest 1 particle(s) at x,y
         with random velocity. direction = True/False = Right/Left
         '''
         orignal_x = x
         orignal_y = y
+
         for i in range(n):
             x = orignal_x + random.randint(-5, 5)
             y = orignal_y + random.randint(-5, 5)
             index = -1
-            if direction:
-                vx = random.randint(1, 2)
-            else:
-                vx = random.randint(-2, -1)
-            vy = random.randint(-2, -1)
-            radius = random.randint(5, 8)
+
+            # generating random velocity for particle.
+            vx = 0
+            if velocity_x != 0:
+                vx = random.randint(velocity_x - 1, velocity_x + 1)
+
+            vy = 0
+            if velocity_y != 0:
+                vy = random.randint(velocity_y - 1, velocity_y + 1)
+
+            radius = random.randint(min_size, max_size)
+
             if len(self.particles) < self.max_particles:
                 self.particles.append(Particle(x, y, radius, vx, vy))
             else:

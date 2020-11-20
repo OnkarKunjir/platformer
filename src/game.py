@@ -28,8 +28,6 @@ class Game:
         self.RENDER_SURFACE_MIDPOINT = (self.RENDER_SURFACE_WIDTH//2, 50 + self.RENDER_SURFACE_HEIGHT//2)
         self.GRAVITY = float(cfg['DEFAULT']['GRAVITY'])
 
-        # self.PARTICLE_FRAME_GAP = 10
-
         # pygame related initalization
         pygame.init()
         pygame.display.set_caption('Blursed Ninja')
@@ -114,7 +112,12 @@ class Game:
             x = self.player.rect.x + self.player.rect.width if self.player.direction else self.player.rect.x
             y = (self.player.rect.y + self.player.rect.height // 2) - 5
 
-            self.particle_system.add(x, y, 5, self.player.direction)
+            if self.player.direction:
+                self.particle_system.add(x, y, n = 5, velocity_x = 3, velocity_y = -1)
+            else:
+                self.particle_system.add(x, y, n = 5, velocity_x = -3, velocity_y = -1)
+
+
         self.score += self.player.move(tiles, self.enemies)
 
         # update enemies postion.
@@ -125,8 +128,8 @@ class Game:
         if self.player.landed:
             x = self.player.rect.x + self.player.rect.width // 2
             y = self.player.rect.y + self.player.rect.height
-            self.particle_system.add(x, y, 3, True)
-            self.particle_system.add(x, y, 3, False)
+            self.particle_system.add(x, y, n = 3, velocity_x = 2, velocity_y = -2)
+            self.particle_system.add(x, y, n = 3, velocity_x = -2, velocity_y = -2)
 
         self.particle_system.update()
 
