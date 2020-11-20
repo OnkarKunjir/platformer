@@ -121,7 +121,7 @@ class Game:
 
 
         self.score += self.player.move(tiles, self.enemies)
-        self.player.update_state()
+        # self.player.update_state()
 
         # update enemies postion.
         for enemy in self.enemies:

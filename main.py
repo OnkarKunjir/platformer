@@ -1,7 +1,7 @@
 from src.game import Game
 import sys
 
-# TODO: standerdise frame count update thing.
+# TODO: make enemies attack the player.
 
 
 if __name__ == '__main__':

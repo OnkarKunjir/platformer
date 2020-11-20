@@ -95,14 +95,12 @@ class Character(Entity):
             self.health += damage
             self.health = min(100, self.health)
 
-    def update_state(self):
+    def update(self):
         self.frame_count += 1
         if self.frame_count > self.frame_count_cap:
             self.frame_count = 0
 
-        if self.frame_count % self.update_per_frame != 0:
-            return
-
+    def update_state(self):
         new_state = None
         if self.in_mid_air:
            new_state = 'jumping'
@@ -112,6 +110,8 @@ class Character(Entity):
             new_state = 'running'
 
         if new_state == self.current_state:
+            if self.frame_count % self.update_per_frame != 0:
+                return
             # if state is same then move to next frame in same state.
             self.current_frame += 1
             if self.current_frame == self.state_n_frames[new_state]:

@@ -92,9 +92,7 @@ class Player(Character):
         enemies = characters to process when attack is done.
         moves the player according to move_direction.
         '''
-        self.frame_count += 1
-        if self.frame_count > self.frame_count_cap:
-            self.frame_count = 0
+        self.update()
 
         if self.frame_count % self.damage_cooldown == 0:
             self.read_to_take_damage = True
@@ -152,6 +150,8 @@ class Player(Character):
         if self.move_direction['attack']:
             self.move_direction['attack'] = False
             self.attack(enemies)
+
+        self.update_state()
         return score
 
     def attack(self, enemies):
