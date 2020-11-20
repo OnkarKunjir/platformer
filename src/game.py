@@ -114,15 +114,7 @@ class Game:
             x = self.player.rect.x + self.player.rect.width if self.player.direction else self.player.rect.x
             y = (self.player.rect.y + self.player.rect.height // 2) - 5
 
-            if self.player.direction:
-                self.particle_system.add(x, y, n = 5, velocity_x = 3, velocity_y = -1)
-            else:
-                self.particle_system.add(x, y, n = 5, velocity_x = -3, velocity_y = -1)
-
-
         self.score += self.player.move(tiles, self.enemies)
-        # self.player.update_state()
-
         # update enemies postion.
         for enemy in self.enemies:
             enemy.move(tiles, self.enemies, self.player, self.camera.translate(enemy.rect))
@@ -229,9 +221,7 @@ class Game:
                 self.render_surface.blit(self.assets.get_block_image(tile.block_type), self.camera.translate(tile.rect))
 
         # draw particles
-        for particle in self.particle_system.particles:
-            if particle.radius == 0:
-                continue
+        for particle in self.particle_system.get_active_particles():
             pygame.draw.circle(self.render_surface, particle.color, self.camera.translate_xy(particle.center), particle.radius)
 
         self.draw_fps()
@@ -240,11 +230,8 @@ class Game:
         if self.player.attack_arc_end_deg != 300:
             self.draw_attack_arc(self.player)
 
-        for enemy in self.enemies:
-            if enemy.attack_arc_end_deg != 300:
-                self.draw_attack_arc(enemy)
-
-
+        for enemy in filter(lambda e : e.attack_arc_end_deg != 300, self.enemies):
+            self.draw_attack_arc(enemy)
 
 
     def play(self):

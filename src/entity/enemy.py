@@ -1,4 +1,3 @@
-from src.entity.entity import check_collision
 from src.entity.character import Character
 from src.entity.reward import Reward
 
@@ -7,11 +6,15 @@ class Enemy(Character):
         super().__init__(x, y, width, height)
         # constants
         self.JUMP_COOLDOWN = 15
+        self.ATTACK_COOLDOWN = 100
 
         self.color = color
-        self.x_offset = 80
+        self.x_offset = 20
         self.first_jumped_ago = 0
+        self.attacked_ago = 0
         self.attack_arc_end_deg = 0
+
+        self.VELOCITY_X_INC = 0.1
 
     def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
         '''
@@ -19,7 +22,7 @@ class Enemy(Character):
         '''
         move = self.velocity
         self.move_x(move[0])
-        colliding_entities = check_collision(self, check_against, max_x, max_y)
+        colliding_entities = filter(self.rect.colliderect, check_against)
 
         left = False
         right = False
@@ -49,7 +52,7 @@ class Enemy(Character):
                 left = True
 
         self.move_y(move[1])
-        colliding_entities = check_collision(self, check_against, max_x, max_y)
+        colliding_entities = filter(self.rect.colliderect, check_against)
 
         for i in colliding_entities:
             if isinstance(i, Reward):
@@ -77,6 +80,8 @@ class Enemy(Character):
 
     def move(self, blocks, comrades, player, translated_location):
         self.read_to_take_damage = True
+        self.attacked_ago += 1
+
         tx, ty, _, _ = translated_location
         if tx < 0 or tx > self.RENDER_SURFACE_WIDTH or ty < 0 or ty > self.RENDER_SURFACE_HEIGHT:
             # update postion if and only if enemy is within frame.
@@ -127,6 +132,14 @@ class Enemy(Character):
 
 
     def attack(self, player):
+        return
+        if self.health == 0:
+            self.attacked_ago = 0
+            return
+        if self.attacked_ago < self.ATTACK_COOLDOWN:
+            return
+
+        self.attacked_ago = 0
         self.attack_arc_end_deg += 15
         x_start = None
         x_end = None
@@ -136,7 +149,7 @@ class Enemy(Character):
         if self.direction:
             # looking right
             x_start = self.rect.x + self.rect.width
-            x_end = x_start + 20
+            x_end = x_start + 40
         else:
             # looking left
             x_start = self.rect.x

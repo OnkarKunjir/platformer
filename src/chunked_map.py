@@ -99,7 +99,6 @@ class ChunkedMap:
         self.chunk_x = px//self.chunk_pixel_width
         self.chunk_y = py//self.chunk_pixel_height
         self.blocks_on_screen = []
-        self.random_chunk()
 
 
     def random_chunk(self):

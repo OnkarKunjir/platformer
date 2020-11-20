@@ -33,6 +33,9 @@ class ParticleSystem:
         for particle in self.particles:
             particle.update()
 
+    def get_active_particles(self):
+        return filter(lambda particle : particle.radius > 0, self.particles)
+
     def add(self, x, y, n = 1, velocity_x = 0, velocity_y = 0, min_size = 5, max_size = 8):
         '''
         adds atmost n and at lest 1 particle(s) at x,y

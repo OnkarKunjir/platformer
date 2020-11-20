@@ -90,10 +90,6 @@ class Assets():
             return self.get_static_block_image(block_type)
         return self.get_animated_block_image(block_type, frame)
 
-    def get_player_image(self, direction):
-        direction = 'right' if direction else 'left'
-        return self.player[direction]['ideal'][0]
-
     def get_character_image(self, character):
         direction = 'right' if character.direction else 'left'
         return self.player[direction][character.current_state][character.current_frame]

@@ -1,4 +1,3 @@
-from src.entity.entity import check_collision
 from src.entity.character import Character
 from src.entity.reward import Reward
 import configparser
@@ -43,7 +42,7 @@ class Player(Character):
         score = 0
         move = self.velocity
         self.move_x(move[0])
-        colliding_entities = check_collision(self, check_against, max_x, max_y)
+        colliding_entities = filter(self.rect.colliderect, check_against)
 
         left = False
         right = False
@@ -67,7 +66,8 @@ class Player(Character):
                 left = True
 
         self.move_y(move[1])
-        colliding_entities = check_collision(self, check_against, max_x, max_y)
+
+        colliding_entities = filter(self.rect.colliderect, check_against)
 
         for i in colliding_entities:
             if isinstance(i, Reward):
@@ -163,13 +163,12 @@ class Player(Character):
 
         if self.direction:
             # looking right
-            x_start = self.rect.x + self.rect.width
+            x_start = self.rect.x
             x_end = x_start + 20
         else:
             # looking left
-            x_start = self.rect.x
+            x_start = self.rect.x - self.rect.width
             x_end = x_start - 20
 
-        for enemy in enemies:
-            if len(enemy.rect.clipline(x_start, y_start, x_end, y_end)) > 0:
-                enemy.take_damage(-10)
+        for enemy in filter(lambda e: len(e.rect.clipline(x_start, y_start, x_end, y_end)) > 0, enemies):
+            enemy.take_damage(-20)
