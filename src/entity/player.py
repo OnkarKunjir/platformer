@@ -157,18 +157,12 @@ class Player(Character):
     def attack(self, enemies):
         self.attack_arc_end_deg += 15
         # make enemies suffer.
-        x_start = None
-        x_end = None
-        y_start = y_end  = self.rect.y + 15
-
-        if self.direction:
-            # looking right
-            x_start = self.rect.x
-            x_end = x_start + 20
-        else:
+        damage_area = self.rect.copy()
+        damage_area.width = damage_area.width + 20
+        if not self.direction:
             # looking left
-            x_start = self.rect.x - self.rect.width
-            x_end = x_start - 20
+            damage_area.x -= 20
 
-        for enemy in filter(lambda e: len(e.rect.clipline(x_start, y_start, x_end, y_end)) > 0, enemies):
+
+        for enemy in filter(lambda e: damage_area.colliderect(e), enemies):
             enemy.take_damage(-20)
