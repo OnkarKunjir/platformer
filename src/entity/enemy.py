@@ -132,7 +132,6 @@ class Enemy(Character):
 
 
     def attack(self, player):
-        return
         if self.health == 0:
             self.attacked_ago = 0
             return
