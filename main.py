@@ -1,5 +1,5 @@
 from src.game import Game
-from src.level_designer import LevelDesigner
+from src.level_designer.level_designer import LevelDesigner
 import sys
 
 # TODO:
