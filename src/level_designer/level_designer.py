@@ -60,6 +60,11 @@ class LevelDesigner:
         self.run()
 
     def event_handler(self):
+        '''
+        W, A, S, D : Move camera
+        R          : Reset camera
+        E          : Export map
+        '''
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.RENDER_FRAME = False
@@ -79,6 +84,8 @@ class LevelDesigner:
                 elif event.key == pygame.K_r:
                     self.camera_x = 0
                     self.camera_y = 0
+                elif event.key == pygame.K_e:
+                    self.export()
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_w:
                     self.move_up = False
@@ -173,6 +180,34 @@ class LevelDesigner:
                     Block(x = x, y = y, width = self.BLOCK_WIDTH, height = self.BLOCK_HEIGHT, block_type = self.block_type_button[self.selected_type].block_type)
                 )
 
+
+    def export(self):
+        '''
+        TODO: Handle cases where user is trying to save map without player or saving empty map or something.
+        TODO: design and export in new method.
+        function to export whole map in desired format.
+        '''
+
+        n_cols = (max(self.blocks, key = lambda block : block.rect.x).rect.x // self.BLOCK_WIDTH) + 1
+        n_rows = (max(self.blocks, key = lambda block : block.rect.y).rect.y // self.BLOCK_HEIGHT) + 1
+
+        map_list = [ ['0']*n_cols for _ in range(n_rows) ]
+
+        for block in self.blocks:
+            col = block.rect.x // self.BLOCK_WIDTH
+            row = block.rect.y // self.BLOCK_HEIGHT
+
+            map_list[row][col] = str(block.block_type)
+
+        map_str = ''
+        for row in map_list:
+            map_str += ','.join(row) + '\n'
+
+        # wtirte the map to file.
+        with open('assets/levels/new_map.txt', 'w') as export_file:
+            export_file.write(map_str)
+
+        self.RENDER_FRAME = False
 
     def run(self):
         while self.RENDER_FRAME:
