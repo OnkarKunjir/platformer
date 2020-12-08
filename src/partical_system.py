@@ -1,10 +1,12 @@
 import random
+
+
 class Particle:
-    def __init__(self, x, y, radius, vx, vy, color = (255, 255, 255)):
-        '''
+    def __init__(self, x, y, radius, vx, vy, color=(255, 255, 255)):
+        """
         particle is fundamental component of particle system.
         on screen particles are as cricle at x,y cooridate of radius 'radius'
-        '''
+        """
         self.center = [x, y]
         self.radius = radius
         self.color = random.choice([(255, 255, 255), (200, 200, 200), (150, 150, 150)])
@@ -23,24 +25,24 @@ class Particle:
         if self.vy > 5:
             self.vy = 5
 
+
 class ParticleSystem:
     def __init__(self):
         self.max_particles = 20
-        self.particles = [
-        ]
+        self.particles = []
 
     def update(self):
         for particle in self.particles:
             particle.update()
 
     def get_active_particles(self):
-        return filter(lambda particle : particle.radius > 0, self.particles)
+        return filter(lambda particle: particle.radius > 0, self.particles)
 
-    def add(self, x, y, n = 1, velocity_x = 0, velocity_y = 0, min_size = 5, max_size = 8):
-        '''
+    def add(self, x, y, n=1, velocity_x=0, velocity_y=0, min_size=5, max_size=8):
+        """
         adds atmost n and at lest 1 particle(s) at x,y
         with random velocity. direction = True/False = Right/Left
-        '''
+        """
         orignal_x = x
         orignal_y = y
 

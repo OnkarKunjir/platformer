@@ -1,6 +1,7 @@
 from src.entity.character import Character
 from src.entity.reward import Reward
 
+
 class Enemy(Character):
     def __init__(self, x, y, width, height, color):
         super().__init__(x, y, width, height)
@@ -16,10 +17,10 @@ class Enemy(Character):
 
         self.VELOCITY_X_INC = 0.1
 
-    def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
-        '''
+    def update_pos_from_collision(self, check_against, max_x=None, max_y=None):
+        """
         function updates the position of primary entity based on collision detection.
-        '''
+        """
         move = self.velocity
         self.move_x(move[0])
         colliding_entities = filter(self.rect.colliderect, check_against)
@@ -83,7 +84,12 @@ class Enemy(Character):
         self.attacked_ago += 1
 
         tx, ty, _, _ = translated_location
-        if tx < 0 or tx > self.RENDER_SURFACE_WIDTH or ty < 0 or ty > self.RENDER_SURFACE_HEIGHT:
+        if (
+            tx < 0
+            or tx > self.RENDER_SURFACE_WIDTH
+            or ty < 0
+            or ty > self.RENDER_SURFACE_HEIGHT
+        ):
             # update postion if and only if enemy is within frame.
             return
 
@@ -130,7 +136,6 @@ class Enemy(Character):
         if left or right:
             self.velocity[0] = 0
 
-
     def attack(self, player):
         if self.health == 0:
             self.attacked_ago = 0
@@ -142,8 +147,7 @@ class Enemy(Character):
         self.attack_arc_end_deg += 15
         x_start = None
         x_end = None
-        y_start = y_end  = self.rect.y + 15
-
+        y_start = y_end = self.rect.y + 15
 
         if self.direction:
             # looking right

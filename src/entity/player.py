@@ -1,43 +1,44 @@
-from src.entity.character import Character
-from src.entity.reward import Reward
 import configparser
 
+from src.entity.character import Character
+from src.entity.reward import Reward
+
+
 class Player(Character):
-    '''
+    """
     player extended form entity contains all state variables required by the player.
     handels jumping and moving also.
-    '''
-    def __init__(self, x, y, width, height, update_per_frame = 10):
-        cfg = configparser.ConfigParser()
-        cfg.read('config.ini')
+    """
 
-        frame_mapping_cfg = cfg['PLAYER_FRAME_MAPPING']
+    def __init__(self, x, y, width, height, update_per_frame=10):
+        cfg = configparser.ConfigParser()
+        cfg.read("config.ini")
+
+        frame_mapping_cfg = cfg["PLAYER_FRAME_MAPPING"]
         state_n_frames = {
-            'ideal' : int(frame_mapping_cfg['IDEAL']),
-            'running' : int(frame_mapping_cfg['RUNNING']),
-            'jumping' : int(frame_mapping_cfg['JUMPING'])
+            "ideal": int(frame_mapping_cfg["IDEAL"]),
+            "running": int(frame_mapping_cfg["RUNNING"]),
+            "jumping": int(frame_mapping_cfg["JUMPING"]),
         }
 
         super().__init__(x, y, width, height, state_n_frames, update_per_frame)
         self.move_direction = {
-            'left' : False,
-            'right' : False,
-            'up' : False,
-            'attack' : False
+            "left": False,
+            "right": False,
+            "up": False,
+            "attack": False,
         }
-
 
         self.attack_arc_end_deg = 300
 
-        self.VELOCITY_X_INC = float(cfg['PLAYER']['ACCELERATION'])
-        self.ground_friction = float(cfg['PLAYER']['GROUND_FRICTION'])
-        self.air_resistance = float(cfg['PLAYER']['AIR_RESISTANCE'])
+        self.VELOCITY_X_INC = float(cfg["PLAYER"]["ACCELERATION"])
+        self.ground_friction = float(cfg["PLAYER"]["GROUND_FRICTION"])
+        self.air_resistance = float(cfg["PLAYER"]["AIR_RESISTANCE"])
 
-
-    def update_pos_from_collision(self, check_against, max_x = None, max_y = None):
-        '''
+    def update_pos_from_collision(self, check_against, max_x=None, max_y=None):
+        """
         function updates the position of primary entity based on collision detection.
-        '''
+        """
 
         score = 0
         move = self.velocity
@@ -87,11 +88,11 @@ class Player(Character):
         return left, right, top, bottom, score
 
     def move(self, blocks, enemies):
-        '''
+        """
         blocks = static blocks for collision detection and reward
         enemies = characters to process when attack is done.
         moves the player according to move_direction.
-        '''
+        """
         self.update()
 
         if self.frame_count % self.damage_cooldown == 0:
@@ -100,20 +101,24 @@ class Player(Character):
         # update velocity of player.
         self.velocity[1] += self.GRAVITY
 
-        if self.move_direction['up'] and (not self.in_mid_air or self.jump_count < self.MAX_JUMP_COUNT):
+        if self.move_direction["up"] and (
+            not self.in_mid_air or self.jump_count < self.MAX_JUMP_COUNT
+        ):
             self.jump()
 
-        self.move_direction['up'] = False
+        self.move_direction["up"] = False
 
-        if self.move_direction['left']:
+        if self.move_direction["left"]:
             self.velocity[0] -= self.VELOCITY_X_INC
             self.direction = False
-        if self.move_direction['right']:
+        if self.move_direction["right"]:
             self.velocity[0] += self.VELOCITY_X_INC
             self.direction = True
 
-        if not self.move_direction['left'] and not self.move_direction['right']:
-            current_friction = self.air_resistance if self.in_mid_air else self.ground_friction
+        if not self.move_direction["left"] and not self.move_direction["right"]:
+            current_friction = (
+                self.air_resistance if self.in_mid_air else self.ground_friction
+            )
 
             if abs(self.velocity[0]) < 0.1:
                 self.velocity[0] = 0
@@ -128,7 +133,7 @@ class Player(Character):
             # if player is dead make horizontal velocity zero.
             self.velocity[0] = 0
 
-        left, right, top, bottom, score= self.update_pos_from_collision(blocks)
+        left, right, top, bottom, score = self.update_pos_from_collision(blocks)
         # stop player from moving out of map.
         self.rect.x = max(0, self.rect.x)
         self.rect.y = max(0, self.rect.y)
@@ -147,8 +152,8 @@ class Player(Character):
         if not self.in_mid_air:
             self.jump_count = 0
 
-        if self.move_direction['attack']:
-            self.move_direction['attack'] = False
+        if self.move_direction["attack"]:
+            self.move_direction["attack"] = False
             self.attack(enemies)
 
         self.update_state()
@@ -162,7 +167,6 @@ class Player(Character):
         if not self.direction:
             # looking left
             damage_area.x -= 20
-
 
         for enemy in filter(lambda e: damage_area.colliderect(e), enemies):
             enemy.take_damage(-20)
