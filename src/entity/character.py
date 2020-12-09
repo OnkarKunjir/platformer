@@ -84,7 +84,7 @@ class Character(Entity):
         elif self.velocity[1] < -self.MAX_VELOCITY[1]:
             self.velocity[1] = -self.MAX_VELOCITY[1]
 
-    def take_damage(self, damage):
+    def take_damage(self, damage, forced=False):
         """
         NOTE: function expects parameters to be handled by the derived classes.
         function to receive damage from outside entity.
@@ -92,7 +92,7 @@ class Character(Entity):
         if +ve damage is provided it is added to health wihtout any restriction.
         """
         if damage < 0:
-            if self.read_to_take_damage:
+            if self.read_to_take_damage or forced:
                 self.read_to_take_damage = False
                 self.health += damage
                 self.health = max(0, self.health)
@@ -101,11 +101,17 @@ class Character(Entity):
             self.health = min(100, self.health)
 
     def update(self):
+        """
+        function to update frame counter to keep animation and other thing in sync.
+        """
         self.frame_count += 1
         if self.frame_count > self.frame_count_cap:
             self.frame_count = 0
 
     def update_state(self):
+        """
+        function to update animation state of the character based on state variables.
+        """
         new_state = None
         if self.in_mid_air:
             new_state = "jumping"

@@ -41,6 +41,9 @@ class ChunkedMap:
         self.xb, self.xf = xlimit
         self.yb, self.yf = ylimit
 
+        self.map_width = 0
+        self.map_height = 0
+
         self.load_chunk_map(
             (BLOCK_WIDTH, BLOCK_HEIGHT),
             (RENDER_SURFACE_WIDTH, RENDER_SURFACE_HEIGHT),
@@ -68,7 +71,7 @@ class ChunkedMap:
                 width=image_size[0],
                 height=image_size[1],
                 block_type=block_type,
-                health_gain=-5,
+                health_gain=-20,
                 score_gain=0,
             )
         elif block_type == 5:
@@ -130,8 +133,11 @@ class ChunkedMap:
                                             )
                                         )
                             x += image_size[0]
+                            self.map_width = max(x, self.map_width)
                         y += image_size[1]
 
+                self.map_height = y
+                self.player.max_depth = self.map_height + 100
                 # convering list into tuples
                 for key in self.chunks.keys():
                     self.chunks[key] = tuple(self.chunks[key])

@@ -10,7 +10,9 @@ class Player(Character):
     handels jumping and moving also.
     """
 
-    def __init__(self, x, y, width, height, update_per_frame=10):
+    def __init__(
+        self, x, y, width, height, max_depth=float("inf"), update_per_frame=10
+    ):
         cfg = configparser.ConfigParser()
         cfg.read("config.ini")
 
@@ -22,6 +24,7 @@ class Player(Character):
         }
 
         super().__init__(x, y, width, height, state_n_frames, update_per_frame)
+        self.max_depth = max_depth
         self.move_direction = {
             "left": False,
             "right": False,
@@ -155,6 +158,10 @@ class Player(Character):
         if self.move_direction["attack"]:
             self.move_direction["attack"] = False
             self.attack(enemies)
+
+        if self.rect.y > self.max_depth:
+            # kill the player if he/she falls from the map. don't let them suffer for infinity.
+            self.take_damage(-100, forced=True)
 
         self.update_state()
         return score
