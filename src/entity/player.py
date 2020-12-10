@@ -38,6 +38,8 @@ class Player(Character):
         self.ground_friction = float(cfg["PLAYER"]["GROUND_FRICTION"])
         self.air_resistance = float(cfg["PLAYER"]["AIR_RESISTANCE"])
 
+        self.damage_took_before = 0
+
     def update_pos_from_collision(self, check_against, max_x=None, max_y=None):
         """
         function updates the position of primary entity based on collision detection.
@@ -98,8 +100,11 @@ class Player(Character):
         """
         self.update()
 
-        if self.frame_count % self.damage_cooldown == 0:
-            self.read_to_take_damage = True
+        if not self.read_to_take_damage:
+            self.damage_took_before += 1
+            if self.damage_took_before == self.damage_cooldown:
+                self.damage_took_before = 0
+                self.read_to_take_damage = True
 
         # update velocity of player.
         self.velocity[1] += self.GRAVITY

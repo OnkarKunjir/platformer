@@ -45,7 +45,7 @@ class Character(Entity):
 
         # following parameters can be changed by the derived classes
         self.VELOCITY_X_INC = 3
-        self.damage_cooldown = 40
+        self.damage_cooldown = 30
         self.read_to_take_damage = True
         self.frame_count = 0
         self.frame_count_cap = 100
@@ -102,7 +102,7 @@ class Character(Entity):
 
     def update(self):
         """
-        function to update frame counter to keep animation and other thing in sync.
+        function to update frame counter to keep track of animation frame.
         """
         self.frame_count += 1
         if self.frame_count > self.frame_count_cap:

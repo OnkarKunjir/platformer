@@ -1,4 +1,5 @@
 import configparser
+import random
 
 import pygame
 
@@ -71,6 +72,10 @@ class Game:
         # assets
         self.assets = Assets()
         self.assets.load_assets()
+
+        self.moon = pygame.Surface((80, 80))
+        self.moon.set_colorkey((0, 0, 0))
+        pygame.draw.circle(self.moon, (50, 50, 50), (40, 40), 40)
 
     def event_handler(self):
         """
@@ -245,11 +250,30 @@ class Game:
                 ),
             )
 
+    def get_tile_blit_seq(self, tile):
+        if isinstance(tile, AnimatedEntity):
+            return (
+                self.assets.get_block_image(tile.block_type, tile.current_frame),
+                self.camera.translate(tile.rect),
+            )
+
+        elif tile.block_type > 0:
+            return (
+                self.assets.get_block_image(tile.block_type),
+                self.camera.translate(tile.rect),
+            )
+
     def draw_frame(self):
         """
         function to draw elements of render screen.
         """
         self.render_surface.fill((135, 206, 235))
+        # self.render_surface.fill((33, 38, 63))
+        self.render_surface.blit(
+            self.moon,
+            (self.RENDER_SURFACE_WIDTH - 150, 80),
+            special_flags=pygame.BLEND_ADD,
+        )
 
         # draw background
         self.draw_background()
@@ -268,19 +292,12 @@ class Game:
             self.draw_enemy_health(enemy)
 
         # draw tiles
-        for tile in self.chunked_map.get_blocks():
-            if isinstance(tile, Reward) and not tile.is_valid:
-                continue
-            elif isinstance(tile, AnimatedEntity):
-                self.render_surface.blit(
-                    self.assets.get_block_image(tile.block_type, tile.current_frame),
-                    self.camera.translate(tile.rect),
-                )
-            elif tile.block_type > 0:
-                self.render_surface.blit(
-                    self.assets.get_block_image(tile.block_type),
-                    self.camera.translate(tile.rect),
-                )
+        tiles = filter(
+            lambda tile: not isinstance(tile, Reward) or tile.is_valid,
+            self.chunked_map.get_blocks(),
+        )
+        tiles = map(self.get_tile_blit_seq, tiles)
+        self.render_surface.blits(tiles)
 
         # draw particles
         for particle in self.particle_system.get_active_particles():
@@ -300,11 +317,19 @@ class Game:
         for enemy in filter(lambda e: e.attack_arc_end_deg != 300, self.enemies):
             self.draw_attack_arc(enemy)
 
+        if not self.player.read_to_take_damage:
+            red_s = pygame.Surface(
+                (self.RENDER_SURFACE_WIDTH, self.RENDER_SURFACE_HEIGHT)
+            )
+            red_s.fill((100, 0, 0))
+            self.render_surface.blit(red_s, (0, 0), special_flags=pygame.BLEND_ADD)
+
     def play(self):
         """
         run main game loop
         """
         frame_time = 0
+        last_angle = 5
         while self.RENDER_FRAME:
             frame_time += self.clock.get_time()
             if frame_time > 15:
@@ -318,7 +343,6 @@ class Game:
             )
             self.display.blit(scaled_surface, (0, 0))
 
-            self.frames += 1
             pygame.display.update()
             self.clock.tick()
 
