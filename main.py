@@ -4,6 +4,7 @@ from src.game import Game
 from src.level_designer.level_designer import LevelDesigner
 
 # TODO:
+# Scale the render surface more.
 # build a level designer
 # make bot more smort.
 
