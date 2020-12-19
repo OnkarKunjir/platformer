@@ -1,8 +1,13 @@
 import configparser
+import pickle
 
 import pygame
 from src.assets import Assets
+from src.entity.animated_block import AnimatedBlock
 from src.entity.block import Block
+from src.entity.enemy import Enemy
+from src.entity.player import Player
+from src.entity.reward import Reward
 
 
 class LevelDesigner:
@@ -174,6 +179,8 @@ class LevelDesigner:
             self.render_surface.blit(self.assets.get_block_image(i.block_type), i.rect)
 
     def draw_grid(self):
+        # NOTE: useless in non-legacy mode.
+        # function draws grid on the screen accroding to the block width and block height.
         for i in range(0, self.RENDER_SURFACE_WIDTH, self.BLOCK_WIDTH):
             pygame.draw.line(
                 self.render_surface, (0, 0, 0), (i, 0), (i, self.RENDER_SURFACE_HEIGHT)
@@ -257,37 +264,106 @@ class LevelDesigner:
             elif self.remove_block and len(prev) > 0:
                 del self.blocks[self.blocks.index(prev[0])]
 
-    def export(self):
+    def get_entity(self, x, y, image_size, block_type):
+        """
+        function return entity object of appropriate type according to block_type.
+        """
+        if block_type == 3:
+            return Reward(
+                x=x,
+                y=y,
+                width=image_size[0],
+                height=image_size[1],
+                block_type=block_type,
+                health_gain=0,
+                score_gain=10,
+            )
+        elif block_type == 4:
+            return Reward(
+                x=x,
+                y=y,
+                width=image_size[0],
+                height=image_size[1],
+                block_type=block_type,
+                health_gain=-20,
+                score_gain=0,
+            )
+        elif block_type == 5:
+            return AnimatedBlock(
+                x=x,
+                y=y,
+                width=image_size[0],
+                height=image_size[1],
+                block_type=block_type,
+                n_frames=2,
+            )
+        else:
+            return Block(
+                x=x,
+                y=y,
+                width=image_size[0],
+                height=image_size[1],
+                block_type=block_type,
+            )
+
+    def export(self, leagacy_mode=False):
         """
         TODO: Handle cases where user is trying to save map without player or saving empty map or something.
         TODO: design and export in new method.
         function to export whole map in desired format.
         """
 
-        n_cols = (
-            max(self.blocks, key=lambda block: block.rect.x).rect.x // self.BLOCK_WIDTH
-        ) + 1
-        n_rows = (
-            max(self.blocks, key=lambda block: block.rect.y).rect.y // self.BLOCK_HEIGHT
-        ) + 1
+        if leagacy_mode:
+            n_cols = (
+                max(self.blocks, key=lambda block: block.rect.x).rect.x
+                // self.BLOCK_WIDTH
+            ) + 1
+            n_rows = (
+                max(self.blocks, key=lambda block: block.rect.y).rect.y
+                // self.BLOCK_HEIGHT
+            ) + 1
 
-        map_list = [["0"] * n_cols for _ in range(n_rows)]
+            map_list = [["0"] * n_cols for _ in range(n_rows)]
 
-        for block in self.blocks:
-            col = block.rect.x // self.BLOCK_WIDTH
-            row = block.rect.y // self.BLOCK_HEIGHT
+            for block in self.blocks:
+                col = block.rect.x // self.BLOCK_WIDTH
+                row = block.rect.y // self.BLOCK_HEIGHT
 
-            map_list[row][col] = str(block.block_type)
+                map_list[row][col] = str(block.block_type)
 
-        map_str = ""
-        for row in map_list:
-            map_str += ",".join(row) + "\n"
+            map_str = ""
+            for row in map_list:
+                map_str += ",".join(row) + "\n"
 
-        # wtirte the map to file.
-        with open("assets/levels/new_map.txt", "w") as export_file:
-            export_file.write(map_str)
+            # wtirte the map to file.
+            with open("assets/levels/new_map.txt", "w") as export_file:
+                export_file.write(map_str)
+            self.RENDER_FRAME = False
 
-        self.RENDER_FRAME = False
+        else:
+            # export object directly which is more flexible.
+            chunked_map = {}
+            for block in self.blocks:
+                rect = block.rect
+                cx = rect.x // (self.CHUNK_SIZE * rect.width)
+                cy = rect.y // (self.CHUNK_SIZE * rect.height)
+
+                # convert each block into appropriate entity.
+                converted_block = self.get_entity(
+                    rect.x, rect.y, (rect.width, rect.height), block.block_type
+                )
+
+                if (cx, cy) in chunked_map.keys():
+                    chunked_map[(cx, cy)].append(converted_block)
+                else:
+                    chunked_map[(cx, cy)] = [converted_block]
+
+            # convert list into tuple cause it's not gonna change.
+            for key in chunked_map.keys():
+                chunked_map[key] = tuple(chunked_map[key])
+
+            with open("assets/levels/new_map.map", "wb") as new_map:
+                pickle.dump(chunked_map, new_map)
 
     def run(self):
         while self.RENDER_FRAME:

@@ -1,5 +1,6 @@
 import configparser
 import random
+import threading
 
 import pygame
 
@@ -338,10 +339,10 @@ class Game:
                 self.update_entities()
                 self.draw_frame()
 
-            scaled_surface = pygame.transform.scale(
-                self.render_surface, (self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT)
-            )
-            self.display.blit(scaled_surface, (0, 0))
+                scaled_surface = pygame.transform.scale(
+                    self.render_surface, (self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT)
+                )
+                self.display.blit(scaled_surface, (0, 0))
 
             pygame.display.update()
             self.clock.tick()

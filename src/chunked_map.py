@@ -1,5 +1,6 @@
 import configparser
 import os
+import pickle
 import random
 
 import noise
@@ -44,11 +45,12 @@ class ChunkedMap:
         self.map_width = 0
         self.map_height = 0
 
-        self.load_chunk_map(
-            (BLOCK_WIDTH, BLOCK_HEIGHT),
-            (RENDER_SURFACE_WIDTH, RENDER_SURFACE_HEIGHT),
-            CHUNK_SIZE,
-        )
+        self.load_chunk_map()
+        # self.load_chunk_map_legacy(
+        #     (BLOCK_WIDTH, BLOCK_HEIGHT),
+        #     (RENDER_SURFACE_WIDTH, RENDER_SURFACE_HEIGHT),
+        #     CHUNK_SIZE,
+        # )
 
     def get_entity(self, x, y, image_size, block_type):
         """
@@ -92,7 +94,17 @@ class ChunkedMap:
                 block_type=block_type,
             )
 
-    def load_chunk_map(self, image_size, display_size, chunk_size):
+    def load_chunk_map(self):
+        level_path = "assets/levels/" + self.level_name + ".map"
+        self.chunks = {}
+
+        self.player = Player(x=0, y=0, width=20, height=40)
+
+        if os.path.exists(level_path):
+            with open(level_path, "rb") as lvl:
+                self.chunks = pickle.load(lvl)
+
+    def load_chunk_map_legacy(self, image_size, display_size, chunk_size):
         level_path = "assets/levels/" + self.level_name + ".txt"
         self.chunks = {}
 
