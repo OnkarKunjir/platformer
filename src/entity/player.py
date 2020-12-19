@@ -49,6 +49,9 @@ class Player(Character):
         move = self.velocity
         self.move_x(move[0])
         colliding_entities = filter(self.rect.colliderect, check_against)
+        # colliding_entities = filter(
+        #     lambda x: self.rect.colliderect(x.rect), check_against
+        # )
 
         left = False
         right = False
@@ -74,6 +77,9 @@ class Player(Character):
         self.move_y(move[1])
 
         colliding_entities = filter(self.rect.colliderect, check_against)
+        # colliding_entities = filter(
+        #     lambda x: self.rect.colliderect(x.rect), check_against
+        # )
 
         for i in colliding_entities:
             if isinstance(i, Reward):

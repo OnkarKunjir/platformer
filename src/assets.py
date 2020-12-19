@@ -30,7 +30,7 @@ class Assets:
                 )
                 self.static_blocks[i + 1] = image.load(image_name)
 
-        # laod animated block assets
+        # load animated block assets
         animation_id_start = len(self.static_block_assets_class)
 
         for i, asset_name in enumerate(self.animated_block_assets_class):

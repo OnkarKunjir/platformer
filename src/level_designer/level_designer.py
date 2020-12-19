@@ -5,9 +5,9 @@ import pygame
 from src.assets import Assets
 from src.entity.animated_block import AnimatedBlock
 from src.entity.block import Block
-from src.entity.enemy import Enemy
-from src.entity.player import Player
 from src.entity.reward import Reward
+
+# TODO: add snapping mechanisum.
 
 
 class LevelDesigner:
@@ -43,21 +43,22 @@ class LevelDesigner:
         self.RENDER_FRAME = True
         self.place_block = False
         self.remove_block = False
+        self.poor_mans_snapping = False
         self.blocks = []
 
         self.block_type_button = (
             Block(
                 x=6 * self.BLOCK_WIDTH,
                 y=self.RENDER_SURFACE_HEIGHT - 3 * self.BLOCK_HEIGHT,
-                width=self.BLOCK_WIDTH,
-                height=self.BLOCK_HEIGHT,
+                width=26,
+                height=26,
                 block_type=1,
             ),
             Block(
                 x=7 * self.BLOCK_WIDTH,
                 y=self.RENDER_SURFACE_HEIGHT - 3 * self.BLOCK_HEIGHT,
-                width=self.BLOCK_WIDTH,
-                height=self.BLOCK_HEIGHT,
+                width=26,
+                height=26,
                 block_type=2,
             ),
             Block(
@@ -70,8 +71,8 @@ class LevelDesigner:
             Block(
                 x=9 * self.BLOCK_WIDTH,
                 y=self.RENDER_SURFACE_HEIGHT - 3 * self.BLOCK_HEIGHT,
-                width=self.BLOCK_WIDTH,
-                height=self.BLOCK_HEIGHT,
+                width=16,
+                height=16,
                 block_type=4,
             ),
             Block(
@@ -104,6 +105,7 @@ class LevelDesigner:
         W, A, S, D : Move camera
         R          : Reset camera
         E          : Export map
+        <SPACE>    : toggle snapping
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -126,6 +128,9 @@ class LevelDesigner:
                     self.camera_y = 0
                 elif event.key == pygame.K_e:
                     self.export()
+                elif event.key == pygame.K_SPACE:
+                    self.poor_mans_snapping = not self.poor_mans_snapping
+
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_w:
                     self.move_up = False
@@ -181,11 +186,21 @@ class LevelDesigner:
     def draw_grid(self):
         # NOTE: useless in non-legacy mode.
         # function draws grid on the screen accroding to the block width and block height.
-        for i in range(0, self.RENDER_SURFACE_WIDTH, self.BLOCK_WIDTH):
+        #
+        # self.block_type_button[self.selected_type].rect.width
+        for i in range(
+            0,
+            self.RENDER_SURFACE_WIDTH,
+            self.block_type_button[self.selected_type].rect.width,
+        ):
             pygame.draw.line(
                 self.render_surface, (0, 0, 0), (i, 0), (i, self.RENDER_SURFACE_HEIGHT)
             )
-        for i in range(0, self.RENDER_SURFACE_HEIGHT, self.BLOCK_HEIGHT):
+        for i in range(
+            0,
+            self.RENDER_SURFACE_HEIGHT,
+            self.block_type_button[self.selected_type].rect.width,
+        ):
             pygame.draw.line(
                 self.render_surface, (0, 0, 0), (0, i), (self.RENDER_SURFACE_WIDTH, i)
             )
@@ -209,13 +224,13 @@ class LevelDesigner:
 
     def update(self):
         if self.move_bottom:
-            self.camera_y += self.BLOCK_HEIGHT
+            self.camera_y += 26
         if self.move_up:
-            self.camera_y -= self.BLOCK_HEIGHT
+            self.camera_y -= 26
         if self.move_right:
-            self.camera_x += self.BLOCK_WIDTH
+            self.camera_x += 26
         if self.move_left:
-            self.camera_x -= self.BLOCK_WIDTH
+            self.camera_x -= 26
 
         # keeping the positivity... lol
         self.camera_x = max(0, self.camera_x)
@@ -236,31 +251,50 @@ class LevelDesigner:
                 if self.place_block:
                     # if user was pressing left click then and then only change the block type.
                     self.selected_type = clicked_button[0].block_type - 1
+                    # TODO: fix this this very bad :(
+                    self.camera_x = 0
+                    self.camera_y = 0
 
                 self.place_block = False
                 self.remove_block = False
                 return
 
-            x = (self.BLOCK_WIDTH * (x // self.BLOCK_WIDTH)) + self.camera_x
-            y = (self.BLOCK_HEIGHT * (y // self.BLOCK_HEIGHT)) + self.camera_y
+            x = (
+                self.block_type_button[self.selected_type].rect.width
+                * (x // self.block_type_button[self.selected_type].rect.width)
+            ) + self.camera_x
+            y = (
+                self.block_type_button[self.selected_type].rect.height
+                * (y // self.block_type_button[self.selected_type].rect.height)
+            ) + self.camera_y
+            temp_block = Block(
+                x=x,
+                y=y,
+                width=self.block_type_button[self.selected_type].rect.width,
+                height=self.block_type_button[self.selected_type].rect.height,
+                block_type=self.block_type_button[self.selected_type].block_type,
+            )
 
             prev = list(
                 filter(
-                    lambda block: (block.rect.x == x and block.rect.y == y), self.blocks
+                    lambda block: temp_block.rect.colliderect(block.rect), self.blocks
                 )
             )
-            if self.place_block and len(prev) == 0:
-                self.blocks.append(
-                    Block(
-                        x=x,
-                        y=y,
-                        width=self.BLOCK_WIDTH,
-                        height=self.BLOCK_HEIGHT,
-                        block_type=self.block_type_button[
-                            self.selected_type
-                        ].block_type,
+            if self.place_block:
+                if len(prev) == 0:
+                    self.blocks.append(temp_block)
+                elif self.poor_mans_snapping:
+                    # hack to align items when out of sync
+                    temp_block.rect.bottom = prev[0].rect.top
+                    prev = list(
+                        filter(
+                            lambda block: temp_block.rect.colliderect(block.rect),
+                            self.blocks,
+                        )
                     )
-                )
+                    if len(prev) == 0:
+                        self.blocks.append(temp_block)
+
             elif self.remove_block and len(prev) > 0:
                 del self.blocks[self.blocks.index(prev[0])]
 

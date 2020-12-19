@@ -281,6 +281,13 @@ class Game:
 
         # pygame.draw.rect(self.render_surface, (255,255,255), self.camera.translate(pygame.Rect(self.chunked_map.chunk_x*200, self.chunked_map.chunk_y*200, 200, 200)))
         # self.render_surface.blit(self.assets.get_player_image(self.player.direction), self.camera.translate(self.player.rect))
+
+        pygame.draw.rect(
+            self.render_surface,
+            (255, 255, 255),
+            self.camera.translate(self.player.rect),
+        )
+
         self.render_surface.blit(
             self.assets.get_character_image(self.player),
             self.camera.translate(self.player.rect),
@@ -300,6 +307,13 @@ class Game:
         tiles = map(self.get_tile_blit_seq, tiles)
         self.render_surface.blits(tiles)
 
+        # code to mask perticular block type.
+        # for i in self.chunked_map.get_blocks():
+        #     if i.block_type == 2:
+        #         pygame.draw.rect(
+        #             self.render_surface, (255, 255, 255), self.camera.translate(i.rect)
+        #         )
+        #
         # draw particles
         for particle in self.particle_system.get_active_particles():
             pygame.draw.circle(
