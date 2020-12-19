@@ -63,7 +63,7 @@ class Player(Character):
                 if i.is_valid:
                     score += i.score_gain
                     self.take_damage(i.health_gain)
-                    if i.block_type == 3:
+                    if i.block_type == 4:
                         i.is_valid = False
                 continue
 
@@ -86,7 +86,7 @@ class Player(Character):
                 if i.is_valid:
                     score += i.score_gain
                     self.take_damage(i.health_gain)
-                    if i.block_type == 3:
+                    if i.block_type == 4:
                         i.is_valid = False
                 continue
             elif move[1] > 0:

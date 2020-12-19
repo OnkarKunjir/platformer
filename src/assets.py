@@ -2,16 +2,28 @@ import os
 
 from pygame import image, transform
 
+"""
+mapping with id:
+0: air
+1: dirt
+2: grass
+3: spike
+4: coin
+5: stick
+6: enemy
+"""
+
 
 class Assets:
     def __init__(self):
         self.static_block_assets_class = [
             "dirt",
             "grass",
-            "coin",
             "spike",
         ]
+
         self.animated_block_assets_class = [
+            "coin",
             "stick",
         ]
 

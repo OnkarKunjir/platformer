@@ -45,12 +45,12 @@ class ChunkedMap:
         self.map_width = 0
         self.map_height = 0
 
-        self.load_chunk_map()
-        # self.load_chunk_map_legacy(
-        #     (BLOCK_WIDTH, BLOCK_HEIGHT),
-        #     (RENDER_SURFACE_WIDTH, RENDER_SURFACE_HEIGHT),
-        #     CHUNK_SIZE,
-        # )
+        # self.load_chunk_map()
+        self.load_chunk_map_legacy(
+            (BLOCK_WIDTH, BLOCK_HEIGHT),
+            (RENDER_SURFACE_WIDTH, RENDER_SURFACE_HEIGHT),
+            CHUNK_SIZE,
+        )
 
     def get_entity(self, x, y, image_size, block_type):
         """
@@ -63,8 +63,8 @@ class ChunkedMap:
                 width=image_size[0],
                 height=image_size[1],
                 block_type=block_type,
-                health_gain=0,
-                score_gain=10,
+                health_gain=-20,
+                score_gain=0,
             )
         elif block_type == 4:
             return Reward(
@@ -73,8 +73,9 @@ class ChunkedMap:
                 width=image_size[0],
                 height=image_size[1],
                 block_type=block_type,
-                health_gain=-20,
-                score_gain=0,
+                health_gain=0,
+                score_gain=10,
+                n_frames=5,
             )
         elif block_type == 5:
             return AnimatedBlock(

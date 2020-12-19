@@ -121,6 +121,7 @@ class Game:
         self.chunked_map.update(self.player.rect.x, self.player.rect.y)
         self.enemies = tuple(self.chunked_map.get_special_entities_on_screen())
 
+        # update animation of tiles.
         tiles = self.chunked_map.get_blocks()
         for tile in tiles:
             if isinstance(tile, AnimatedEntity):
