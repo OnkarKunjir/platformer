@@ -27,14 +27,14 @@ class ChunkedMap:
         RENDER_SURFACE_HEIGHT = int(cfg["DEFAULT"]["RENDER_SURFACE_HEIGHT"])
         BLOCK_WIDTH = int(cfg["DEFAULT"]["BLOCK_WIDTH"])
         BLOCK_HEIGHT = int(cfg["DEFAULT"]["BLOCK_HEIGHT"])
-        CHUNK_SIZE = int(cfg["DEFAULT"]["CHUNK_SIZE"])
+        self.CHUNK_SIZE = int(cfg["DEFAULT"]["CHUNK_SIZE"])
 
         self.level_name = level_name
         self.chunks = {}
         self.special_entities = []
         self.player = None
-        self.chunk_pixel_width = CHUNK_SIZE * BLOCK_WIDTH
-        self.chunk_pixel_height = CHUNK_SIZE * BLOCK_HEIGHT
+        # self.chunk_pixel_width = self.CHUNK_SIZE * BLOCK_WIDTH
+        # self.chunk_pixel_height = self.CHUNK_SIZE * BLOCK_HEIGHT
         self.chunk_x = 0
         self.chunk_y = 0
         self.blocks_on_screen = []
@@ -45,12 +45,12 @@ class ChunkedMap:
         self.map_width = 0
         self.map_height = 0
 
-        # self.load_chunk_map()
-        self.load_chunk_map_legacy(
-            (BLOCK_WIDTH, BLOCK_HEIGHT),
-            (RENDER_SURFACE_WIDTH, RENDER_SURFACE_HEIGHT),
-            CHUNK_SIZE,
-        )
+        self.load_chunk_map()
+        # self.load_chunk_map_legacy(
+        #     (BLOCK_WIDTH, BLOCK_HEIGHT),
+        #     (RENDER_SURFACE_WIDTH, RENDER_SURFACE_HEIGHT),
+        #     self.CHUNK_SIZE,
+        # )
 
     def get_entity(self, x, y, image_size, block_type):
         """
@@ -121,8 +121,8 @@ class ChunkedMap:
                             cell = int(cell)
                             if cell > 0:
                                 if cell < 6:
-                                    cx = x // self.chunk_pixel_width
-                                    cy = y // self.chunk_pixel_height
+                                    cx = x // self.CHUNK_SIZE
+                                    cy = y // self.CHUNK_SIZE
                                     if (cx, cy) not in self.chunks.keys():
                                         self.chunks[(cx, cy)] = []
                                     self.chunks[(cx, cy)].append(
@@ -160,8 +160,8 @@ class ChunkedMap:
         update chunk index based on players position.
         px,py = x and y coordinate of player.
         """
-        self.chunk_x = px // self.chunk_pixel_width
-        self.chunk_y = py // self.chunk_pixel_height
+        self.chunk_x = px // self.CHUNK_SIZE
+        self.chunk_y = py // self.CHUNK_SIZE
         self.blocks_on_screen = []
         # NOTE: uncomment this to generate random chunk.
         # self.random_chunk()
@@ -172,15 +172,15 @@ class ChunkedMap:
         """
         for i in range(self.chunk_x - self.xb, self.chunk_x + self.xf):
             for j in range(self.chunk_y - self.yb, self.chunk_y + self.yf):
-                x = i * self.chunk_pixel_width
-                y = j * self.chunk_pixel_height
+                x = i * self.CHUNK_SIZE
+                y = j * self.CHUNK_SIZE
                 cx = i
                 cy = j
                 if (cx, cy) not in self.chunks.keys():
                     self.chunks[(cx, cy)] = []
 
                     for row in range(10):
-                        x = i * self.chunk_pixel_width
+                        x = i * self.CHUNK_SIZE
                         for col in range(10):
                             height = (
                                 int(noise.pnoise1(x * 0.01, repeat=999999999) * 4) * 20
@@ -207,7 +207,7 @@ class ChunkedMap:
 
     def is_enemy_in_frame(self, enemy):
 
-        cx = enemy.rect.x // self.chunk_pixel_width
+        cx = enemy.rect.x // self.CHUNK_SIZE
         cy = enemy.rect.y // self.chunk_pixel_height
 
         if self.chunk_x - self.xb <= cx <= self.chunk_x + self.xf:

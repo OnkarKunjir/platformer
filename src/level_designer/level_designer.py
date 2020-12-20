@@ -7,8 +7,6 @@ from src.entity.animated_block import AnimatedBlock
 from src.entity.block import Block
 from src.entity.reward import Reward
 
-# TODO: add snapping mechanisum.
-
 
 class LevelDesigner:
     def __init__(self):
@@ -62,17 +60,17 @@ class LevelDesigner:
                 block_type=2,
             ),
             Block(
-                x=8 * self.BLOCK_WIDTH,
-                y=self.RENDER_SURFACE_HEIGHT - 3 * self.BLOCK_HEIGHT,
-                width=self.BLOCK_WIDTH,
-                height=self.BLOCK_HEIGHT,
-                block_type=3,
-            ),
-            Block(
                 x=9 * self.BLOCK_WIDTH,
                 y=self.RENDER_SURFACE_HEIGHT - 3 * self.BLOCK_HEIGHT,
                 width=16,
                 height=16,
+                block_type=3,
+            ),
+            Block(
+                x=8 * self.BLOCK_WIDTH,
+                y=self.RENDER_SURFACE_HEIGHT - 3 * self.BLOCK_HEIGHT,
+                width=8,
+                height=8,
                 block_type=4,
             ),
             Block(
@@ -165,8 +163,8 @@ class LevelDesigner:
         return Block(
             x=x,
             y=y,
-            width=self.BLOCK_WIDTH,
-            height=self.BLOCK_HEIGHT,
+            width=block.rect.width,
+            height=block.rect.height,
             block_type=block.block_type,
         )
 
@@ -309,8 +307,8 @@ class LevelDesigner:
                 width=image_size[0],
                 height=image_size[1],
                 block_type=block_type,
-                health_gain=0,
-                score_gain=10,
+                health_gain=-20,
+                score_gain=0,
             )
         elif block_type == 4:
             return Reward(
@@ -319,8 +317,9 @@ class LevelDesigner:
                 width=image_size[0],
                 height=image_size[1],
                 block_type=block_type,
-                health_gain=-20,
-                score_gain=0,
+                health_gain=0,
+                score_gain=10,
+                n_frames=5,
             )
         elif block_type == 5:
             return AnimatedBlock(
@@ -343,7 +342,6 @@ class LevelDesigner:
     def export(self, leagacy_mode=False):
         """
         TODO: Handle cases where user is trying to save map without player or saving empty map or something.
-        TODO: design and export in new method.
         function to export whole map in desired format.
         """
 
@@ -379,8 +377,8 @@ class LevelDesigner:
             chunked_map = {}
             for block in self.blocks:
                 rect = block.rect
-                cx = rect.x // (self.CHUNK_SIZE * rect.width)
-                cy = rect.y // (self.CHUNK_SIZE * rect.height)
+                cx = rect.x // self.CHUNK_SIZE
+                cy = rect.y // self.CHUNK_SIZE
 
                 # convert each block into appropriate entity.
                 converted_block = self.get_entity(
