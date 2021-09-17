@@ -7,7 +7,7 @@ LIBDIR   := lib
 
 # compiler options
 CC 		 := cc
-INC      := -I$(LIBDIR)/glfw/include -I$(LIBDIR)/glad/include -I$(LIBDIR)/stb_image/
+INC      := -I$(LIBDIR)/glfw/include -I$(LIBDIR)/glad/include -I$(LIBDIR)/stb_image/ -I$(SRCDIR)
 CFLAGS   := -Wall -Wextra -Og -g $(INC)
 LDFLAGS  := $(LIBDIR)/glfw/src/libglfw3.a $(LIBDIR)/glad/glad.o $(LIBDIR)/stb_image/stb_image.o -lm -ldl -lrt -lpthread
 
