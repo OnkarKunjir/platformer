@@ -1,6 +1,8 @@
 ## Blursed ninja
 Blursed ninja is a platformer game built in pyton using pygame.
 
+I switched to developing this game in python using pygame to C using opengl.
+
 ### Assets
 | Usedin | Source |
 | ----------- | ----------- |
