@@ -1,0 +1,6 @@
+#+title: Platformer
+#+author: Onkar Kunjir
+
+Creating a platformer game from scratch in C and using openGL for rendering graphics.
+Orignally this project was supposed to be built using python and pygame but I decided to redo all of my work in c for various
+reasons. Project built using python can be accessed on this [[https://github.com/OnkarKunjir/platformer/tree/main][branch]].
