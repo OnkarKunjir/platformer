@@ -1,4 +1,5 @@
 #include "gfx/buffer.h"
+#include "gfx/shader.h"
 #include "gfx/window.h"
 
 int main() {
@@ -20,15 +21,19 @@ int main() {
   struct Buffer index_buffer = create_buffer(
       GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, sizeof(index), index);
 
+  GLuint solid_shader = create_shader("assets/shaders/solid_vs.glsl",
+                                      "assets/shaders/solid_fs.glsl");
+
   while (!window_should_close()) {
     glad_glDrawElements(GL_TRIANGLES, sizeof(index) / sizeof(int),
                         GL_UNSIGNED_INT, 0);
     update_window();
   }
-  destroy_window();
 
   destroy_buffer(&vertex_buffer);
   destroy_buffer(&index_buffer);
+  destroy_shader(solid_shader);
+  destroy_window();
 
   return 0;
 }
