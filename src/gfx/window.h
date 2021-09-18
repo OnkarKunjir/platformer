@@ -1,5 +1,6 @@
 /**
  * Function creates glfw window and initalizes openGL context.
+ * NOTE: Call this function before calling any openGL functions.
  */
 void create_window(const char *title, int width, int height);
 
